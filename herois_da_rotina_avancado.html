@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heróis da Rotina - Versão Completa</title>
+    <style>
+        /* Importar fontes do Google */
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Nunito:wght@400;600;700&display=swap');
+
+        /* Reset e Estilos Gerais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 10px;
+            overflow-x: hidden;
+        }
+
+        /* Container Principal */
+        .app-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        /* Navegação Superior */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 50px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        /* Título Principal */
+        .app-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.8rem;
+            color: #4a5568;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-subtitle {
+            font-size: 0.9rem;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+
+        /* Seções do App */
+        .app-section {
+            display: none;
+        }
+
+        .app-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Área do Avatar Melhorada */
+        .avatar-area {
+            position: relative;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #avatar {
+            width: 180px;
+            height: 180px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 6rem;
+            color: white;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(66, 153, 225, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.8);
+        }
+
+        #avatar::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: transform 0.6s;
+            opacity: 0;
+        }
+
+        #avatar.celebrating::before {
+            opacity: 1;
+            transform: rotate(45deg) translateX(100%);
+        }
+
+        #avatar-face {
+            transition: all 0.5s ease;
+            z-index: 2;
+        }
+
+        /* Efeitos Visuais do Avatar */
+        .avatar-effects {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .olheiras {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 20px;
+            background: rgba(139, 94, 60, 0.7);
+            border-radius: 50%;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .sujeira {
+            position: absolute;
+            background: #8B4513;
+            border-radius: 50%;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .sujeira.s1 { width: 25px; height: 25px; top: 40px; left: 45px; }
+        .sujeira.s2 { width: 20px; height: 20px; top: 90px; right: 40px; }
+        .sujeira.s3 { width: 18px; height: 18px; top: 120px; left: 35px; }
+
+        .energia-brilho {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(72, 187, 120, 0.3), transparent);
+            display: none;
+            animation: pulse 2s infinite;
+        }
+
+        /* Nome do Herói */
+        .hero-name {
+            font-weight: 700;
+            color: #4a5568;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .hero-status {
+            font-size: 0.85rem;
+            color: #718096;
+            font-style: italic;
+        }
+
+        /* Barras de Status Melhoradas */
+        .status-section {
+            background: rgba(247, 250, 252, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        .status-title {
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .status-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-icon {
+            font-size: 1.5rem;
+            width: 35px;
+            text-align: center;
+        }
+
+        .status-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .status-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .progress-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .energia-bar { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .higiene-bar { background: linear-gradient(90deg, #4299e1, #3182ce); }
+        .felicidade-bar { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+
+        /* Luzio - O Guia */
+        .luzio-container {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .luzio-avatar {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, #fbbf24, #f59e0b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 15px;
+            animation: glow 2s ease-in-out infinite alternate;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+        }
+
+        .luzio-message {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            color: #4a5568;
+            font-weight: 600;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .luzio-message::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 8px solid rgba(255, 255, 255, 0.9);
+        }
+
+        /* Painel de Missões */
+        .missions-panel {
+            background: rgba(247, 250, 252, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .missions-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .mission-group {
+            background: white;
+            border-radius: 15px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .mission-group:hover {
+            border-color: #4299e1;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .mission-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .mission-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .mission-info h3 {
+            font-weight: 700;
+            color: #4a5568;
+            font-size: 1rem;
+            margin-bottom: 3px;
+        }
+
+        .mission-description {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .mission-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mission-btn {
+            flex: 1;
+            min-width: 120px;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mission-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .mission-btn:hover::before {
+            left: 100%;
+        }
+
+        .mission-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(66, 153, 225, 0.3);
+        }
+
+        .mission-btn:active {
+            transform: translateY(0);
+        }
+
+        .mission-btn.secondary {
+            background: linear-gradient(135deg, #ed8936, #dd6b20);
+        }
+
+        .mission-btn.secondary:hover {
+            box-shadow: 0 8px 20px rgba(237, 137, 54, 0.3);
+        }
+
+        /* Conquistas */
+        .achievements-section {
+            background: rgba(247, 250, 252, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .achievements-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .achievement-item {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .achievement-item.unlocked {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+        }
+
+        .achievement-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .achievement-icon {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .achievement-item.locked .achievement-icon {
+            filter: grayscale(100%);
+            opacity: 0.5;
+        }
+
+        .achievement-name {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .achievement-description {
+            font-size: 0.7rem;
+            color: #718096;
+        }
+
+        /* Modo Família */
+        .family-section {
+            background: rgba(247, 250, 252, 0.8);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .family-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.3rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .family-members {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .family-member {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4299e1, #3182ce);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .member-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .member-name {
+            font-weight: 700;
+            color: #4a5568;
+            margin-bottom: 5px;
+        }
+
+        .member-status {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .member-progress {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .mini-progress {
+            flex: 1;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .mini-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Funcionalidade de Calma */
+        .calm-section {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .calm-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+        }
+
+        .breathing-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.4));
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4a5568;
+            transition: transform 4s ease-in-out;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .breathing-circle.inhale {
+            transform: scale(1.2);
+        }
+
+        .breathing-circle.exhale {
+            transform: scale(0.8);
+        }
+
+        .calm-instructions {
+            font-size: 1rem;
+            color: #4a5568;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .calm-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .calm-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .calm-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Feedback e Conquistas */
+        .feedback-section {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 25px rgba(72, 187, 120, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            animation: rotate 20s linear infinite;
+        }
+
+        .feedback-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .feedback-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .feedback-message {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+        }
+
+        .points-gained {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .point-item {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Resumo do Dia */
+        .day-summary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .summary-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .next-adventure {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+
+        @keyframes glow {
+            from { box-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
+            to { box-shadow: 0 0 30px rgba(251, 191, 36, 0.8); }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .celebrating {
+            animation: bounce 1s ease;
+        }
+
+        /* Responsividade */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 20px;
+                margin: 5px;
+            }
+            
+            .mission-buttons {
+                flex-direction: column;
+            }
+            
+            .mission-btn {
+                min-width: auto;
+            }
+            
+            .summary-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .achievements-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .calm-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Estados especiais */
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navegação Superior -->
+        <div class="top-nav">
+            <button class="nav-btn active" onclick="showSection('main')" title="Página Principal">🏠</button>
+            <h1 class="app-title">Heróis da Rotina</h1>
+            <button class="nav-btn" onclick="showSection('family')" title="Modo Família">👨‍👩‍👧‍👦</button>
+        </div>
+
+        <!-- Seção Principal -->
+        <div id="main-section" class="app-section active">
+            <p class="app-subtitle">Os Guardiões da Luz de Luminara</p>
+
+            <!-- Avatar e Status do Herói -->
+            <div class="avatar-area">
+                <div id="avatar">
+                    <div id="avatar-face">😊</div>
+                    <div class="avatar-effects">
+                        <div class="olheiras"></div>
+                        <div class="sujeira s1"></div>
+                        <div class="sujeira s2"></div>
+                        <div class="sujeira s3"></div>
+                        <div class="energia-brilho"></div>
+                    </div>
+                </div>
+                <div class="hero-name" id="hero-name">Guardião da Luz</div>
+                <div class="hero-status" id="hero-status">Pronto para a aventura!</div>
+            </div>
+
+            <!-- Barras de Status -->
+            <div class="status-section">
+                <div class="status-title">⚡ Cristais de Luminara</div>
+                <div class="status-bars">
+                    <div class="status-bar">
+                        <div class="status-icon">⚡</div>
+                        <div class="status-info">
+                            <div class="status-label">Cristal da Força</div>
+                            <div class="progress-container">
+                                <div class="progress-bar energia-bar" id="energia-bar" style="width: 70%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-icon">💧</div>
+                        <div class="status-info">
+                            <div class="status-label">Cristal do Brilho</div>
+                            <div class="progress-container">
+                                <div class="progress-bar higiene-bar" id="higiene-bar" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="status-bar">
+                        <div class="status-icon">💖</div>
+                        <div class="status-info">
+                            <div class="status-label">Cristal do Coração</div>
+                            <div class="progress-container">
+                                <div class="progress-bar felicidade-bar" id="felicidade-bar" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Luzio - O Guia -->
+            <div class="luzio-container">
+                <div class="luzio-avatar">🌟</div>
+                <div class="luzio-message" id="luzio-message">
+                    Olá, Guardião! Bem-vindo a Luminara! Os Cristais precisam da sua ajuda para brilhar. Escolha uma missão para começar a aventura!
+                </div>
+            </div>
+
+            <!-- Painel de Missões -->
+            <div class="missions-panel">
+                <div class="missions-title">🎯 Missões do Dia</div>
+                
+                <div class="mission-group">
+                    <div class="mission-header">
+                        <div class="mission-icon">🍎</div>
+                        <div class="mission-info">
+                            <h3>Fortaleza da Alvorada</h3>
+                            <div class="mission-description">Recarregue o Cristal da Força</div>
+                        </div>
+                    </div>
+                    <div class="mission-buttons">
+                        <button class="mission-btn" onclick="realizarMissao('comerBem')">
+                            Refeição Completa
+                        </button>
+                        <button class="mission-btn secondary" onclick="realizarMissao('comerPouco')">
+                            Lanche Rápido
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mission-group">
+                    <div class="mission-header">
+                        <div class="mission-icon">🦷</div>
+                        <div class="mission-info">
+                            <h3>Escudo de Menta</h3>
+                            <div class="mission-description">Derrote o Bafodonte</div>
+                        </div>
+                    </div>
+                    <div class="mission-buttons">
+                        <button class="mission-btn" onclick="realizarMissao('escovarDentes')">
+                            Escovação Completa
+                        </button>
+                        <button class="mission-btn secondary" onclick="realizarMissao('naoEscovar')">
+                            Pular Missão
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mission-group">
+                    <div class="mission-header">
+                        <div class="mission-icon">🚿</div>
+                        <div class="mission-info">
+                            <h3>Cascata Purificante</h3>
+                            <div class="mission-description">Ative a Barreira Protetora</div>
+                        </div>
+                    </div>
+                    <div class="mission-buttons">
+                        <button class="mission-btn" onclick="realizarMissao('banhoCompleto')">
+                            Banho Completo
+                        </button>
+                        <button class="mission-btn secondary" onclick="realizarMissao('banhoRapido')">
+                            Banho Rápido
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mission-group">
+                    <div class="mission-header">
+                        <div class="mission-icon">🌙</div>
+                        <div class="mission-info">
+                            <h3>Fonte dos Sonhos</h3>
+                            <div class="mission-description">Recarregue todos os Cristais</div>
+                        </div>
+                    </div>
+                    <div class="mission-buttons">
+                        <button class="mission-btn" onclick="realizarMissao('dormirBem')">
+                            Dormir na Hora
+                        </button>
+                        <button class="mission-btn secondary" onclick="realizarMissao('dormirTarde')">
+                            Dormir Tarde
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão para Funcionalidade de Calma -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button class="calm-btn" onclick="showSection('calm')">
+                    🧘‍♀️ Momento de Calma
+                </button>
+            </div>
+
+            <!-- Conquistas -->
+            <div class="achievements-section">
+                <div class="achievements-title">🏆 Conquistas</div>
+                <div class="achievements-grid" id="achievements-grid">
+                    <!-- Conquistas serão adicionadas dinamicamente -->
+                </div>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="feedback-section hidden" id="feedback-section">
+                <div class="feedback-content">
+                    <div class="feedback-title" id="feedback-title">🎉 Missão Concluída!</div>
+                    <div class="feedback-message" id="feedback-message">
+                        Parabéns! Você completou uma missão e ajudou a proteger Luminara!
+                    </div>
+                    <div class="points-gained" id="points-gained">
+                        <div class="point-item">+15 Energia</div>
+                        <div class="point-item">+5 Felicidade</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo do Dia -->
+            <div class="day-summary">
+                <div class="summary-title">📊 Progresso de Hoje</div>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <span class="stat-value" id="missions-completed">3</span>
+                        <span class="stat-label">Missões</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="total-points">85</span>
+                        <span class="stat-label">Pontos</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="streak-days">2</span>
+                        <span class="stat-label">Dias</span>
+                    </div>
+                </div>
+                <div class="next-adventure">
+                    <strong>🗺️ Próxima Aventura:</strong><br>
+                    Amanhã exploraremos a Floresta Encantada! Mantenha seus cristais fortes para enfrentar os desafios que nos aguardam.
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Modo Família -->
+        <div id="family-section" class="app-section">
+            <div class="family-section">
+                <div class="family-title">👨‍👩‍👧‍👦 Aventura em Família</div>
+                <div class="family-members" id="family-members">
+                    <!-- Membros da família serão adicionados dinamicamente -->
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="mission-btn" onclick="addFamilyMember()">
+                        ➕ Adicionar Membro
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Calma -->
+        <div id="calm-section" class="app-section">
+            <div class="calm-section">
+                <div class="calm-title">🧘‍♀️ Momento de Calma</div>
+                <div class="calm-instructions" id="calm-instructions">
+                    Vamos respirar juntos! Clique no círculo e siga o ritmo.
+                </div>
+                <div class="breathing-circle" id="breathing-circle" onclick="startBreathing()">
+                    Respirar
+                </div>
+                <div class="calm-controls">
+                    <button class="calm-btn" onclick="startBreathing()">Começar</button>
+                    <button class="calm-btn" onclick="stopBreathing()">Parar</button>
+                    <button class="calm-btn" onclick="showSection('main')">Voltar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado do jogo
+        const gameState = {
+            energia: 70,
+            higiene: 80,
+            felicidade: 60,
+            missoesConcluidas: 0,
+            pontosTotal: 0,
+            sequenciaDias: 2,
+            conquistas: [],
+            familyMembers: []
+        };
+
+        // Conquistas disponíveis
+        const achievements = [
+            { id: 'first_mission', name: 'Primeira Missão', description: 'Complete sua primeira missão', icon: '🌟', unlocked: false },
+            { id: 'perfect_day', name: 'Dia Perfeito', description: 'Complete todas as missões em um dia', icon: '🏆', unlocked: false },
+            { id: 'energy_master', name: 'Mestre da Energia', description: 'Mantenha energia em 100%', icon: '⚡', unlocked: false },
+            { id: 'hygiene_hero', name: 'Herói da Higiene', description: 'Mantenha higiene em 100%', icon: '💧', unlocked: false },
+            { id: 'happiness_champion', name: 'Campeão da Felicidade', description: 'Mantenha felicidade em 100%', icon: '😊', unlocked: false },
+            { id: 'week_warrior', name: 'Guerreiro da Semana', description: '7 dias consecutivos', icon: '🗓️', unlocked: false }
+        ];
+
+        // Elementos da interface
+        const elements = {
+            avatar: document.getElementById('avatar'),
+            avatarFace: document.getElementById('avatar-face'),
+            heroStatus: document.getElementById('hero-status'),
+            energiaBar: document.getElementById('energia-bar'),
+            higieneBar: document.getElementById('higiene-bar'),
+            felicidadeBar: document.getElementById('felicidade-bar'),
+            luzioMessage: document.getElementById('luzio-message'),
+            feedbackSection: document.getElementById('feedback-section'),
+            feedbackTitle: document.getElementById('feedback-title'),
+            feedbackMessage: document.getElementById('feedback-message'),
+            pointsGained: document.getElementById('points-gained'),
+            missionsCompleted: document.getElementById('missions-completed'),
+            totalPoints: document.getElementById('total-points'),
+            streakDays: document.getElementById('streak-days'),
+            olheiras: document.querySelector('.olheiras'),
+            sujeiras: document.querySelectorAll('.sujeira'),
+            energiaBrilho: document.querySelector('.energia-brilho'),
+            achievementsGrid: document.getElementById('achievements-grid'),
+            familyMembers: document.getElementById('family-members'),
+            breathingCircle: document.getElementById('breathing-circle'),
+            calmInstructions: document.getElementById('calm-instructions')
+        };
+
+        // Mensagens do Luzio para cada ação
+        const luzioMessages = {
+            comerBem: "Incrível! O Cristal da Força está pulsando com energia! Você repeliu os Preguiçosos e seu herói está pronto para qualquer desafio!",
+            comerPouco: "É um começo, Guardião. Ganhamos um pouco de força, mas os Preguiçosos ainda rondam. Precisaremos de mais energia em breve!",
+            escovarDentes: "Missão cumprida! O sorriso do seu herói está tão brilhante que o Bafodonte fugiu! O Cristal do Brilho agradece!",
+            naoEscovar: "Cuidado, Guardião! O Bafodonte está deixando o hálito do seu herói sombrio. Isso pode assustar os aliados de Luminara!",
+            banhoCompleto: "Fantástico! A Barreira Purificante está ativa! Seu herói está limpo, cheiroso e imune aos Melequentos. O Cristal do Brilho está radiante!",
+            banhoRapido: "A barreira está de pé, mas um pouco fraca. Alguns Melequentos podem tentar passar. Um banho mais forte amanhã garantirá proteção total!",
+            dormirBem: "Perfeito! Uma noite na Fonte dos Sonhos restaurou todos os cristais! Seu herói acordou renovado e 100% pronto para a ação!",
+            dormirTarde: "Oh não! Dormir tarde deixou seu herói com olheiras. Os Preguiçosos aproveitaram para drenar energia durante o sono."
+        };
+
+        // Configurações das missões
+        const missionsConfig = {
+            comerBem: { energia: 20, higiene: 0, felicidade: 5, pontos: 25 },
+            comerPouco: { energia: 5, higiene: 0, felicidade: 0, pontos: 5 },
+            escovarDentes: { energia: 0, higiene: 15, felicidade: 5, pontos: 20 },
+            naoEscovar: { energia: 0, higiene: -10, felicidade: -5, pontos: 0 },
+            banhoCompleto: { energia: 0, higiene: 30, felicidade: 10, pontos: 40 },
+            banhoRapido: { energia: 0, higiene: 10, felicidade: 2, pontos: 12 },
+            dormirBem: { energia: 30, higiene: 0, felicidade: 15, pontos: 45 },
+            dormirTarde: { energia: -20, higiene: 0, felicidade: -10, pontos: 0 }
+        };
+
+        // Variáveis para respiração
+        let breathingInterval = null;
+        let breathingPhase = 'inhale';
+
+        // Função para mostrar seções
+        function showSection(sectionName) {
+            // Esconde todas as seções
+            document.querySelectorAll('.app-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove classe active de todos os botões de navegação
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostra a seção selecionada
+            document.getElementById(sectionName + '-section').classList.add('active');
+
+            // Ativa o botão correspondente
+            if (sectionName === 'main') {
+                document.querySelector('.nav-btn[onclick="showSection(\'main\')"]').classList.add('active');
+            } else if (sectionName === 'family') {
+                document.querySelector('.nav-btn[onclick="showSection(\'family\')"]').classList.add('active');
+            }
+        }
+
+        // Função principal para realizar missões
+        function realizarMissao(tipoMissao) {
+            const config = missionsConfig[tipoMissao];
+            
+            // Atualiza o estado do jogo
+            gameState.energia = Math.max(0, Math.min(100, gameState.energia + config.energia));
+            gameState.higiene = Math.max(0, Math.min(100, gameState.higiene + config.higiene));
+            gameState.felicidade = Math.max(0, Math.min(100, gameState.felicidade + config.felicidade));
+            gameState.pontosTotal += config.pontos;
+            
+            if (config.pontos > 0) {
+                gameState.missoesConcluidas++;
+            }
+
+            // Simula decaimento natural
+            gameState.higiene = Math.max(0, gameState.higiene - 3);
+            gameState.energia = Math.max(0, gameState.energia - 1);
+
+            // Verifica conquistas
+            checkAchievements();
+
+            // Atualiza a interface
+            atualizarInterface(tipoMissao, config);
+            
+            // Mostra feedback
+            mostrarFeedback(tipoMissao, config);
+            
+            // Adiciona efeito de celebração se foi uma ação positiva
+            if (config.pontos > 0) {
+                elements.avatar.classList.add('celebrating');
+                setTimeout(() => {
+                    elements.avatar.classList.remove('celebrating');
+                }, 1000);
+            }
+
+            // Salva o progresso
+            saveProgress();
+        }
+
+        // Verifica e desbloqueia conquistas
+        function checkAchievements() {
+            // Primeira missão
+            if (gameState.missoesConcluidas >= 1 && !achievements.find(a => a.id === 'first_mission').unlocked) {
+                unlockAchievement('first_mission');
+            }
+
+            // Mestre da Energia
+            if (gameState.energia >= 100 && !achievements.find(a => a.id === 'energy_master').unlocked) {
+                unlockAchievement('energy_master');
+            }
+
+            // Herói da Higiene
+            if (gameState.higiene >= 100 && !achievements.find(a => a.id === 'hygiene_hero').unlocked) {
+                unlockAchievement('hygiene_hero');
+            }
+
+            // Campeão da Felicidade
+            if (gameState.felicidade >= 100 && !achievements.find(a => a.id === 'happiness_champion').unlocked) {
+                unlockAchievement('happiness_champion');
+            }
+        }
+
+        // Desbloqueia uma conquista
+        function unlockAchievement(achievementId) {
+            const achievement = achievements.find(a => a.id === achievementId);
+            if (achievement && !achievement.unlocked) {
+                achievement.unlocked = true;
+                gameState.conquistas.push(achievementId);
+                
+                // Mostra notificação
+                setTimeout(() => {
+                    alert(`🎉 Conquista Desbloqueada!\n${achievement.icon} ${achievement.name}\n${achievement.description}`);
+                }, 1000);
+                
+                renderAchievements();
+            }
+        }
+
+        // Renderiza as conquistas
+        function renderAchievements() {
+            elements.achievementsGrid.innerHTML = '';
+            
+            achievements.forEach(achievement => {
+                const achievementElement = document.createElement('div');
+                achievementElement.className = `achievement-item ${achievement.unlocked ? 'unlocked' : 'locked'}`;
+                
+                achievementElement.innerHTML = `
+                    <span class="achievement-icon">${achievement.icon}</span>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-description">${achievement.description}</div>
+                `;
+                
+                elements.achievementsGrid.appendChild(achievementElement);
+            });
+        }
+
+        // Adiciona membro da família
+        function addFamilyMember() {
+            const name = prompt('Nome do membro da família:');
+            if (name) {
+                const member = {
+                    id: Date.now(),
+                    name: name,
+                    energia: Math.floor(Math.random() * 50) + 50,
+                    higiene: Math.floor(Math.random() * 50) + 50,
+                    felicidade: Math.floor(Math.random() * 50) + 50,
+                    avatar: ['👨', '👩', '👧', '👦'][Math.floor(Math.random() * 4)]
+                };
+                
+                gameState.familyMembers.push(member);
+                renderFamilyMembers();
+                saveProgress();
+            }
+        }
+
+        // Renderiza membros da família
+        function renderFamilyMembers() {
+            elements.familyMembers.innerHTML = '';
+            
+            gameState.familyMembers.forEach(member => {
+                const memberElement = document.createElement('div');
+                memberElement.className = 'family-member';
+                
+                memberElement.innerHTML = `
+                    <div class="member-avatar">${member.avatar}</div>
+                    <div class="member-info">
+                        <div class="member-name">${member.name}</div>
+                        <div class="member-status">Guardião Júnior</div>
+                        <div class="member-progress">
+                            <div class="mini-progress">
+                                <div class="mini-progress-fill energia-bar" style="width: ${member.energia}%"></div>
+                            </div>
+                            <div class="mini-progress">
+                                <div class="mini-progress-fill higiene-bar" style="width: ${member.higiene}%"></div>
+                            </div>
+                            <div class="mini-progress">
+                                <div class="mini-progress-fill felicidade-bar" style="width: ${member.felicidade}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                elements.familyMembers.appendChild(memberElement);
+            });
+        }
+
+        // Inicia exercício de respiração
+        function startBreathing() {
+            if (breathingInterval) return;
+            
+            elements.calmInstructions.textContent = 'Inspire... segure... expire... Siga o círculo!';
+            
+            breathingInterval = setInterval(() => {
+                if (breathingPhase === 'inhale') {
+                    elements.breathingCircle.classList.remove('exhale');
+                    elements.breathingCircle.classList.add('inhale');
+                    elements.breathingCircle.textContent = 'Inspire';
+                    breathingPhase = 'exhale';
+                } else {
+                    elements.breathingCircle.classList.remove('inhale');
+                    elements.breathingCircle.classList.add('exhale');
+                    elements.breathingCircle.textContent = 'Expire';
+                    breathingPhase = 'inhale';
+                }
+            }, 4000);
+        }
+
+        // Para exercício de respiração
+        function stopBreathing() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+                elements.breathingCircle.classList.remove('inhale', 'exhale');
+                elements.breathingCircle.textContent = 'Respirar';
+                elements.calmInstructions.textContent = 'Ótimo trabalho! Você se sente mais calmo agora?';
+            }
+        }
+
+        // Atualiza toda a interface do usuário
+        function atualizarInterface(tipoMissao, config) {
+            // Atualiza barras de progresso
+            elements.energiaBar.style.width = gameState.energia + '%';
+            elements.higieneBar.style.width = gameState.higiene + '%';
+            elements.felicidadeBar.style.width = gameState.felicidade + '%';
+
+            // Atualiza estatísticas
+            elements.missionsCompleted.textContent = gameState.missoesConcluidas;
+            elements.totalPoints.textContent = gameState.pontosTotal;
+
+            // Atualiza aparência do avatar
+            atualizarAvatar();
+
+            // Atualiza mensagem do Luzio
+            elements.luzioMessage.textContent = luzioMessages[tipoMissao];
+        }
+
+        // Atualiza a aparência visual do avatar
+        function atualizarAvatar() {
+            // Determina a expressão facial
+            if (gameState.felicidade > 80 && gameState.energia > 70) {
+                elements.avatarFace.textContent = '🤩';
+                elements.heroStatus.textContent = 'Herói Lendário!';
+            } else if (gameState.felicidade > 60 && gameState.energia > 50) {
+                elements.avatarFace.textContent = '😊';
+                elements.heroStatus.textContent = 'Pronto para a aventura!';
+            } else if (gameState.felicidade > 40) {
+                elements.avatarFace.textContent = '🙂';
+                elements.heroStatus.textContent = 'Seguindo em frente...';
+            } else if (gameState.energia < 30) {
+                elements.avatarFace.textContent = '😴';
+                elements.heroStatus.textContent = 'Precisa descansar...';
+            } else {
+                elements.avatarFace.textContent = '😟';
+                elements.heroStatus.textContent = 'Precisa de cuidados...';
+            }
+
+            // Mostra/esconde olheiras
+            if (gameState.energia < 40) {
+                elements.olheiras.style.display = 'block';
+            } else {
+                elements.olheiras.style.display = 'none';
+            }
+
+            // Mostra/esconde sujeira
+            if (gameState.higiene < 50) {
+                elements.sujeiras.forEach(sujeira => {
+                    sujeira.style.display = 'block';
+                });
+                elements.avatar.style.background = 'linear-gradient(135deg, #a0522d, #8b4513)';
+            } else {
+                elements.sujeiras.forEach(sujeira => {
+                    sujeira.style.display = 'none';
+                });
+                elements.avatar.style.background = 'linear-gradient(135deg, #4299e1, #3182ce)';
+            }
+
+            // Efeito de energia alta
+            if (gameState.energia > 80) {
+                elements.energiaBrilho.style.display = 'block';
+            } else {
+                elements.energiaBrilho.style.display = 'none';
+            }
+        }
+
+        // Mostra feedback detalhado da missão
+        function mostrarFeedback(tipoMissao, config) {
+            // Determina o título do feedback
+            if (config.pontos > 30) {
+                elements.feedbackTitle.textContent = '🌟 Missão Épica!';
+            } else if (config.pontos > 0) {
+                elements.feedbackTitle.textContent = '✅ Missão Concluída!';
+            } else {
+                elements.feedbackTitle.textContent = '⚠️ Atenção, Guardião!';
+            }
+
+            // Atualiza a mensagem
+            elements.feedbackMessage.textContent = luzioMessages[tipoMissao];
+
+            // Mostra pontos ganhos
+            let pointsHTML = '';
+            if (config.energia !== 0) {
+                const sinal = config.energia > 0 ? '+' : '';
+                pointsHTML += `<div class="point-item">${sinal}${config.energia} Energia</div>`;
+            }
+            if (config.higiene !== 0) {
+                const sinal = config.higiene > 0 ? '+' : '';
+                pointsHTML += `<div class="point-item">${sinal}${config.higiene} Higiene</div>`;
+            }
+            if (config.felicidade !== 0) {
+                const sinal = config.felicidade > 0 ? '+' : '';
+                pointsHTML += `<div class="point-item">${sinal}${config.felicidade} Felicidade</div>`;
+            }
+            if (config.pontos > 0) {
+                pointsHTML += `<div class="point-item">+${config.pontos} Pontos</div>`;
+            }
+
+            elements.pointsGained.innerHTML = pointsHTML;
+
+            // Mostra a seção de feedback com animação
+            elements.feedbackSection.classList.remove('hidden');
+            elements.feedbackSection.classList.add('fade-in');
+
+            // Esconde após alguns segundos
+            setTimeout(() => {
+                elements.feedbackSection.classList.add('hidden');
+                elements.feedbackSection.classList.remove('fade-in');
+            }, 4000);
+        }
+
+        // Salva progresso no localStorage
+        function saveProgress() {
+            localStorage.setItem('heroesRoutineProgress', JSON.stringify(gameState));
+        }
+
+        // Carrega progresso do localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('heroesRoutineProgress');
+            if (saved) {
+                const savedState = JSON.parse(saved);
+                Object.assign(gameState, savedState);
+                
+                // Atualiza conquistas
+                gameState.conquistas.forEach(conquistaId => {
+                    const achievement = achievements.find(a => a.id === conquistaId);
+                    if (achievement) achievement.unlocked = true;
+                });
+            }
+        }
+
+        // Função para resetar o dia (útil para testes)
+        function resetarDia() {
+            gameState.energia = 70;
+            gameState.higiene = 80;
+            gameState.felicidade = 60;
+            gameState.missoesConcluidas = 0;
+            gameState.pontosTotal = 0;
+            
+            atualizarInterface('comerBem', { energia: 0, higiene: 0, felicidade: 0, pontos: 0 });
+            elements.luzioMessage.textContent = 'Novo dia em Luminara! Os cristais estão esperando por você, Guardião!';
+            saveProgress();
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            atualizarAvatar();
+            renderAchievements();
+            renderFamilyMembers();
+            elements.feedbackSection.classList.add('hidden');
+            
+            console.log('🌟 Heróis da Rotina - Versão Completa carregado com sucesso!');
+            console.log('Estado inicial:', gameState);
+        });
+
+        // Adiciona funções globais para facilitar testes
+        window.resetarDia = resetarDia;
+        window.gameState = gameState;
+    </script>
+</body>
+</html>
+

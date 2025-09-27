@@ -1509,36 +1509,93 @@
         window.gameState = gameState;
     </script>
 
+
 <script>
 (function(){
-  async function loadExternalActivities(){
+  const MAX_TRIES = 12; // ~6s total (12 * 500ms)
+  const TRY_INTERVAL_MS = 500;
+  let mergedOnce = false;
+  let fetched = false;
+  let externalData = null;
+
+  function log(...args){ try{ console.log("[HR Loader]", ...args); }catch(e){} }
+  function warn(...args){ try{ console.warn("[HR Loader]", ...args); }catch(e){} }
+
+  function tryRender(){
+    const renders = [
+      'renderizarAtividades','renderActivities','renderTarefas','renderTasks','renderUI','buildUI'
+    ];
+    for(const fn of renders){
+      if (typeof window[fn] === 'function'){
+        try{ window[fn](); log("Chamou", fn); return true; }catch(e){ warn("Falha ao render com", fn, e); }
+      }
+    }
+    return false;
+  }
+
+  function applyActivities(novas){
+    if (!novas || !Array.isArray(novas) || novas.length===0){
+      log("Nenhuma atividade externa para aplicar."); return;
+    }
+    // Prefer a global named `atividades`, else create it to expose
+    if (Array.isArray(window.atividades)){
+      const porId = new Map(window.atividades.map(a => [a && a.id, a]).filter(([k])=>!!k));
+      (novas||[]).forEach(a => { if (a && a.id) porId.set(a.id, Object.assign({}, porId.get(a.id)||{}, a)); });
+      window.atividades = Array.from(porId.values());
+      mergedOnce = true;
+      window.dispatchEvent(new CustomEvent('activities-merged', { detail: { total: window.atividades.length }}));
+      log("Merge concluído. Total agora:", window.atividades.length);
+    } else {
+      // Se o app não usa `atividades`, exponha e notifique; o app pode escutar
+      window.externalActivities = novas;
+      window.dispatchEvent(new CustomEvent('external-activities-loaded', { detail: { items: novas }}));
+      log("Expostas em window.externalActivities:", novas.length);
+    }
+    tryRender();
+  }
+
+  async function fetchActivities(){
+    if (fetched) return;
+    fetched = true;
     try{
       const resp = await fetch('activities.json', { cache: 'no-store' });
       if(!resp.ok) throw new Error('HTTP '+resp.status);
-      const novas = await resp.json();
-      if (Array.isArray(window.atividades)) {
-        const porId = new Map(window.atividades.map(a => [a.id, a]));
-        (novas || []).forEach(a => { if (a && a.id) porId.set(a.id, a); });
-        window.atividades = Array.from(porId.values());
-        if (typeof window.renderizarAtividades === 'function') {
-          try { window.renderizarAtividades(); } catch(e){ console.warn('renderizarAtividades falhou:', e); }
-        }
-      } else {
-        window.externalActivities = novas;
-        window.dispatchEvent(new CustomEvent('external-activities-loaded', { detail: { items: novas }}));
-      }
-      console.log('[Heróis da Rotina] activities.json carregado');
+      externalData = await resp.json();
+      log("activities.json carregado:", Array.isArray(externalData) ? externalData.length : externalData);
+      applyActivities(externalData);
     }catch(e){
-      console.warn('[Heróis da Rotina] Falha ao carregar activities.json:', e);
+      warn("Falha ao carregar activities.json:", e);
     }
   }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadExternalActivities);
-  } else {
-    loadExternalActivities();
+
+  function retryLoop(tries=0){
+    const hasGlobal = Array.isArray(window.atividades);
+    if (externalData && !mergedOnce && hasGlobal){
+      applyActivities(externalData);
+    } else if (!externalData){
+      // pode ter sido upload agora; tente buscar novamente após um tempo
+      fetchActivities();
+    }
+    if (tries < MAX_TRIES){
+      setTimeout(()=> retryLoop(tries+1), TRY_INTERVAL_MS);
+    } else {
+      log("Encerrando retries.");
+    }
   }
+
+  // Start
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', ()=>{ fetchActivities(); retryLoop(); });
+  } else {
+    fetchActivities(); retryLoop();
+  }
+
+  // Também re-aplica quando a página ganha foco (caso o deploy tenha sido feito depois)
+  window.addEventListener('focus', ()=>{ fetchActivities(); });
+
 })();
 </script>
+
 
 </body>
 </html>

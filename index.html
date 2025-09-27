@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Heróis da Rotina - Versão Completa</title>
+    <title>Heróis da Rotina</title>
     <style>
         /* Importar fontes do Google */
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Nunito:wght@400;600;700&display=swap');
@@ -1508,6 +1508,38 @@
         window.resetarDia = resetarDia;
         window.gameState = gameState;
     </script>
+
+<script>
+(function(){
+  async function loadExternalActivities(){
+    try{
+      const resp = await fetch('activities.json', { cache: 'no-store' });
+      if(!resp.ok) throw new Error('HTTP '+resp.status);
+      const novas = await resp.json();
+      if (Array.isArray(window.atividades)) {
+        const porId = new Map(window.atividades.map(a => [a.id, a]));
+        (novas || []).forEach(a => { if (a && a.id) porId.set(a.id, a); });
+        window.atividades = Array.from(porId.values());
+        if (typeof window.renderizarAtividades === 'function') {
+          try { window.renderizarAtividades(); } catch(e){ console.warn('renderizarAtividades falhou:', e); }
+        }
+      } else {
+        window.externalActivities = novas;
+        window.dispatchEvent(new CustomEvent('external-activities-loaded', { detail: { items: novas }}));
+      }
+      console.log('[Heróis da Rotina] activities.json carregado');
+    }catch(e){
+      console.warn('[Heróis da Rotina] Falha ao carregar activities.json:', e);
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadExternalActivities);
+  } else {
+    loadExternalActivities();
+  }
+})();
+</script>
+
 </body>
 </html>
 

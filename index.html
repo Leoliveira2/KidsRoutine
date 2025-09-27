@@ -836,6 +836,66 @@
         }
     </style>
 </head>
+    <script>
+(function(){
+  async function overwriteActivities(){
+    try{
+      const resp = await fetch('activities.json', { cache: 'no-store' });
+      if(!resp.ok) throw new Error('HTTP '+resp.status);
+      const novas = await resp.json();
+      if (!Array.isArray(novas) || novas.length === 0) {
+        console.warn('[Overwrite] activities.json vazio ou inválido.');
+        return;
+      }
+
+      // 1) Sobrescreve a fonte principal em memória
+      window.atividades = novas.slice();
+      if (Array.isArray(window.tasks)) window.tasks = window.atividades;
+      if (Array.isArray(window.missoes)) window.missoes = window.atividades;
+      if (Array.isArray(window.atividadesBase)) window.atividadesBase = window.atividades;
+
+      // 2) Migração suave do localStorage (mantém progresso se possível)
+      try {
+        const KEY = 'heroesRoutineProgress';
+        const raw = localStorage.getItem(KEY);
+        const st = raw ? JSON.parse(raw) : {};
+        // tente detectar campos usados para guardar as atividades
+        st.atividades = window.atividades;
+        if (Array.isArray(st.tasks)) st.tasks = window.atividades;
+        if (Array.isArray(st.missoes)) st.missoes = window.atividades;
+        localStorage.setItem(KEY, JSON.stringify(st));
+      } catch(e) {
+        console.warn('[Overwrite] Falha ao migrar localStorage (progresso preservado se possível):', e);
+      }
+
+      // 3) Força re-render
+      const renderCandidatas = [
+        'renderizarAtividades','renderActivities','renderTasks','renderUI','buildUI'
+      ];
+      let renderChamado = false;
+      for (const fn of renderCandidatas) {
+        if (typeof window[fn] === 'function') {
+          try { window[fn](); renderChamado = true; console.log('[Overwrite] Render via', fn); break; }
+          catch(e){ console.warn('[Overwrite] Falha ao render com', fn, e); }
+        }
+      }
+      if (!renderChamado) {
+        // fallback: dispara evento p/ quem escutar
+        window.dispatchEvent(new CustomEvent('activities-overwritten', { detail: { total: window.atividades.length }}));
+        console.log('[Overwrite] Atividades sobrescritas. Total:', window.atividades.length);
+      }
+    } catch(e){
+      console.warn('[Overwrite] Erro ao sobrescrever atividades:', e);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', overwriteActivities);
+  } else {
+    overwriteActivities();
+  }
+})();
+</script>
 <body>
     <div class="app-container">
         <!-- Navegação Superior -->

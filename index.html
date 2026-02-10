@@ -1,318 +1,1867 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Heróis da Rotina</title>
-  <meta name="theme-color" content="#667eea" />
-  <meta name="description" content="Heróis da Rotina - app infantil gamificado" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heróis da Rotina - Versão Completa</title>
+  <meta name="description" content="App de acompanhamento de rotinas infantis com sistema de degradação visual progressiva">
   <style>
-    :root{
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --text:#111827;
-      --muted:#6b7280;
-      --primary:#4f46e5;
-      --primary-2:#667eea;
-      --warn:#f59e0b;
-      --ok:#10b981;
-      --shadow:0 10px 30px rgba(0,0,0,.08);
-      --radius:16px;
+    :root {
+      --primary: #4F46E5;
+      --secondary: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --bg: #F9FAFB;
+      --card: #FFFFFF;
+      --text: #111827;
+      --text-muted: #6B7280;
+      --energia: #10B981;
+      --higiene: #3B82F6;
+      --saude-bucal: #A855F7;
+      --felicidade: #F59E0B;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;font-family:system-ui,'Segoe UI',Roboto,Arial; background:linear-gradient(135deg,#eef2ff 0%,#ede9fe 100%);
-      color:var(--text);
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .app{
-      display:grid; grid-template-columns: minmax(300px,720px) 1fr; gap:24px; min-height:100vh;
-      max-width:1200px; margin:0 auto; padding:24px;
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--text);
     }
-    .left{padding-right:8px}
-    .right{background:linear-gradient(135deg,#7c3aed 0%, #6366f1 100%); border-radius:24px; box-shadow:var(--shadow)}
-    .top-nav{
-      display:flex; align-items:center; gap:12px; margin-bottom:16px;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
     }
-    .nav-btn{border:0; background:#fff; box-shadow:var(--shadow); width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:20px}
-    .nav-btn.active{outline:3px solid rgba(79,70,229,.25)}
-    .app-title{font-weight:800; font-size:1.25rem}
-    .section-title{font-weight:800; font-size:1.15rem; margin:16px 8px}
-    .missions-list{display:flex; flex-direction:column; gap:12px}
-    .mission-card{
-      background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow);
-      padding:16px; display:flex; justify-content:space-between; align-items:center;
+
+    .hidden {
+      display: none !important;
     }
-    .mission-info{max-width:70%}
-    .mission-title{font-weight:800; font-size:1rem}
-    .mission-desc{color:var(--muted); margin-top:4px; font-size:.9rem}
-    .actions-row{display:flex; gap:8px; flex-wrap:wrap}
-    .btn{border:0;border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
-    .btn-primary{background:var(--primary); color:#fff}
-    .btn-secondary{background:var(--warn); color:#fff}
-    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#fff;
-      box-shadow:var(--shadow); font-weight:700}
-    .status-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:12px 8px}
-    .bar{height:10px;background:#e5e7eb;border-radius:999px; overflow:hidden}
-    .bar > span{display:block;height:100%; background:linear-gradient(90deg,#22d3ee,#10b981)}
-    #toast{
-      position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
-      background:#111827;color:#fff;padding:12px 16px;border-radius:12px;display:none;z-index:9999
+
+    /* Tela de Seleção de Perfil */
+    .profile-selection {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
-    @media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
-    @media (max-width: 980px){ .app{grid-template-columns:1fr} .right{min-height:220px} }
+
+    .profile-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .profile-card h1 {
+      font-size: 2.5rem;
+      text-align: center;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .profile-card p {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+
+    .profiles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .profile-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: none;
+      border-radius: 16px;
+      padding: 24px 16px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: var(--shadow);
+      color: white;
+      text-align: center;
+    }
+
+    .profile-btn:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .profile-btn .emoji {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .profile-btn .name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: block;
+    }
+
+    .profile-btn .level {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .parent-btn {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+
+    .add-child-btn {
+      background: white;
+      color: var(--text);
+      border: 2px dashed var(--text-muted);
+    }
+
+    .add-child-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Modo Criança */
+    .child-screen {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    .child-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .child-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .child-info .avatar-emoji {
+      font-size: 2.5rem;
+    }
+
+    .child-info .details h2 {
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+
+    .child-info .stats {
+      display: flex;
+      gap: 12px;
+      font-size: 0.9rem;
+      opacity: 0.95;
+    }
+
+    .exit-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .exit-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Avatar com Estado Visual */
+    .avatar-section {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .avatar-section h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar-display {
+      text-align: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .avatar-character {
+      font-size: 8rem;
+      line-height: 1;
+      position: relative;
+      display: inline-block;
+    }
+
+    .avatar-effects {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2rem;
+      animation: float 2s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    .avatar-status-text {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    /* Barras de Status */
+    .status-bars {
+      display: grid;
+      gap: 16px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-bar .icon {
+      font-size: 1.5rem;
+      width: 32px;
+      text-align: center;
+    }
+
+    .status-bar .info {
+      flex: 1;
+    }
+
+    .status-bar .label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .status-bar .value {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #E5E7EB;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease, background-color 0.5s ease;
+      position: relative;
+    }
+
+    .progress-fill.energia { background: linear-gradient(90deg, #10B981, #059669); }
+    .progress-fill.higiene { background: linear-gradient(90deg, #3B82F6, #2563EB); }
+    .progress-fill.saude-bucal { background: linear-gradient(90deg, #A855F7, #9333EA); }
+    .progress-fill.felicidade { background: linear-gradient(90deg, #F59E0B, #D97706); }
+
+    /* Alerta de Status Baixo */
+    .status-alert {
+      background: #FEF3C7;
+      border-left: 4px solid #F59E0B;
+      padding: 16px;
+      border-radius: 12px;
+      margin: 20px;
+      display: flex;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .status-alert .icon {
+      font-size: 1.5rem;
+    }
+
+    .status-alert .content h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: #92400E;
+    }
+
+    .status-alert .content p {
+      font-size: 0.9rem;
+      color: #78350F;
+    }
+
+    /* Missões */
+    .missions-section {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .missions-section h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mission-card {
+      background: #F9FAFB;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border: 2px solid transparent;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .mission-card.completed {
+      background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+      border-color: #10B981;
+    }
+
+    .mission-card.partial {
+      background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+      border-color: #F59E0B;
+    }
+
+    .mission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 12px;
+    }
+
+    .mission-info {
+      flex: 1;
+    }
+
+    .mission-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .mission-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+
+    .mission-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .mission-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mission-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+      color: white;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #E5E7EB;
+      color: var(--text);
+    }
+
+    .quality-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .quality-badge.perfect {
+      background: #D1FAE5;
+      color: #065F46;
+    }
+
+    .quality-badge.partial {
+      background: #FEF3C7;
+      color: #92400E;
+    }
+
+    .quality-badge.none {
+      background: #FEE2E2;
+      color: #991B1B;
+    }
+
+    /* Modal */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 24px;
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-header h3 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .close-btn:hover {
+      color: var(--text);
+    }
+
+    .quality-options {
+      display: grid;
+      gap: 16px;
+    }
+
+    .quality-option {
+      border: 3px solid #E5E7EB;
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .quality-option:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .quality-option.selected {
+      border-color: var(--primary);
+      background: #EEF2FF;
+    }
+
+    .quality-option .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .quality-option .icon {
+      font-size: 2rem;
+    }
+
+    .quality-option .title {
+      flex: 1;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .quality-option .points {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .quality-option .description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .quality-option .effects {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Painel dos Pais */
+    .parent-screen {
+      background: var(--bg);
+      min-height: 100vh;
+      padding-bottom: 40px;
+    }
+
+    .parent-header {
+      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 0 0 24px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .section {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .section h3 {
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .child-overview {
+      display: grid;
+      gap: 16px;
+    }
+
+    .child-card {
+      background: #F9FAFB;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .child-card .avatar {
+      font-size: 3rem;
+    }
+
+    .child-card .info {
+      flex: 1;
+    }
+
+    .child-card .name {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .child-card .progress {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .child-card .completion {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
+      .profile-card {
+        padding: 24px;
+      }
+
+      .profile-card h1 {
+        font-size: 2rem;
+      }
+
+      .child-header {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .child-info {
+        flex-direction: column;
+      }
+
+      .avatar-character {
+        font-size: 6rem;
+      }
+
+      .mission-header {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .mission-actions {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="left">
-      <div class="top-nav">
-        <button id="btn-main" class="nav-btn active" title="Página Principal">🏠</button>
-        <h1 class="app-title">Heróis da Rotina — Versão Completa</h1>
-        <button id="btn-family" class="nav-btn" title="Modo Família">👨‍👩‍👧‍👦</button>
+
+  <!-- Tela de Seleção de Perfil -->
+  <div id="profileSelection" class="profile-selection">
+    <div class="profile-card">
+      <h1>🏰 Heróis da Rotina</h1>
+      <p>Quem está usando o app hoje?</p>
+      <div id="profilesGrid" class="profiles-grid">
+        <!-- Perfis serão inseridos aqui -->
       </div>
-
-      <!-- Status -->
-      <div class="status-row">
-        <span class="pill">⚡ Energia: <strong id="energia-val">0</strong></span>
-        <span class="pill">🧼 Higiene: <strong id="higiene-val">0</strong></span>
-        <span class="pill">😊 Felicidade: <strong id="felicidade-val">0</strong></span>
-        <span class="pill">⭐ Pontos: <strong id="pontos-val">0</strong></span>
-      </div>
-
-      <!-- Barras -->
-      <div style="padding:0 8px">
-        <div class="bar"><span id="energia-bar" style="width:60%"></span></div>
-        <div class="bar" style="margin-top:6px"><span id="higiene-bar" style="width:60%"></span></div>
-        <div class="bar" style="margin-top:6px"><span id="felicidade-bar" style="width:60%"></span></div>
-      </div>
-
-      <!-- Missões padrão (4) -->
-      <h2 class="section-title">🎯 Missões do Dia</h2>
-      <div id="standard-missions" class="missions-list"></div>
-
-      <!-- Atividades adicionais (do JSON) -->
-      <section class="app-section active" id="extra-activities-section" aria-label="Atividades Adicionais">
-        <h2 class="section-title">🧭 Atividades Adicionais</h2>
-        <div id="extra-activities-list" class="missions-list"></div>
-      </section>
-
-      <!-- Conquistas (placeholder simples) -->
-      <h2 class="section-title">🏆 Conquistas</h2>
-      <div id="achievements" class="missions-list"></div>
     </div>
-
-    <div class="right" aria-label="Painel Visual / Avatar" id="avatar" role="img"></div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast"></div>
+  <!-- Modo Criança -->
+  <div id="childScreen" class="child-screen hidden">
+    <div class="child-header">
+      <div class="child-info">
+        <span class="avatar-emoji" id="childAvatar"></span>
+        <div class="details">
+          <h2 id="childName"></h2>
+          <div class="stats">
+            <span id="childLevel"></span>
+            <span id="childStreak"></span>
+            <span id="childPoints"></span>
+          </div>
+        </div>
+      </div>
+      <button class="exit-btn" onclick="exitChildMode()">Sair</button>
+    </div>
+
+    <!-- Alertas de Status -->
+    <div id="statusAlerts"></div>
+
+    <!-- Avatar com Estado Visual -->
+    <div class="avatar-section">
+      <h3>😊 Seu Herói</h3>
+      <div class="avatar-display">
+        <div class="avatar-effects" id="avatarEffects"></div>
+        <div class="avatar-character" id="avatarCharacter"></div>
+        <div class="avatar-status-text" id="avatarStatusText"></div>
+      </div>
+
+      <!-- Barras de Status -->
+      <div class="status-bars">
+        <div class="status-bar">
+          <span class="icon">⚡</span>
+          <div class="info">
+            <div class="label">
+              <span>Energia</span>
+              <span class="value" id="energiaValue">100%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill energia" id="energiaBar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="icon">🧼</span>
+          <div class="info">
+            <div class="label">
+              <span>Higiene</span>
+              <span class="value" id="higieneValue">100%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill higiene" id="higieneBar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="icon">🦷</span>
+          <div class="info">
+            <div class="label">
+              <span>Saúde Bucal</span>
+              <span class="value" id="saudeBucalValue">100%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill saude-bucal" id="saudeBucalBar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-bar">
+          <span class="icon">💖</span>
+          <div class="info">
+            <div class="label">
+              <span>Felicidade</span>
+              <span class="value" id="felicidadeValue">100%</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill felicidade" id="felicidadeBar" style="width: 100%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Missões do Dia -->
+    <div class="missions-section">
+      <h3>🎯 Missões de Hoje</h3>
+      <div id="missionsContainer"></div>
+    </div>
+
+    <!-- Conquistas -->
+    <div class="missions-section">
+      <h3>🏆 Conquistas</h3>
+      <div id="achievementsContainer"></div>
+    </div>
+  </div>
+
+  <!-- Painel dos Pais -->
+  <div id="parentScreen" class="parent-screen hidden">
+    <div class="parent-header">
+      <div>
+        <h2>👨 Painel dos Pais</h2>
+        <p>Acompanhamento familiar</p>
+      </div>
+      <button class="exit-btn" onclick="exitParentMode()">Sair</button>
+    </div>
+
+    <!-- Visão Geral -->
+    <div class="section">
+      <h3>📊 Visão Geral - Hoje</h3>
+      <div id="childrenOverview" class="child-overview"></div>
+    </div>
+
+    <!-- Gerenciar Atividades -->
+    <div class="section">
+      <h3>⚙️ Gerenciar Atividades</h3>
+      <button class="btn btn-primary" onclick="showAddActivityModal()" style="margin-bottom: 16px;">➕ Nova Atividade</button>
+      <div id="activitiesManager"></div>
+    </div>
+
+    <!-- Registro de Comportamentos -->
+    <div class="section">
+      <h3>📝 Registrar Comportamento</h3>
+      <div id="behaviorLogger"></div>
+    </div>
+
+    <!-- Relatório -->
+    <div class="section">
+      <h3>📈 Relatório</h3>
+      <button class="btn btn-primary" onclick="exportData()">💾 Exportar Dados (JSON)</button>
+    </div>
+  </div>
+
+  <!-- Modal de Qualidade -->
+  <div id="qualityModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>✅ Como você fez?</h3>
+        <button class="close-btn" onclick="closeQualityModal()">✕</button>
+      </div>
+      <div id="qualityMissionInfo" style="margin-bottom: 24px; text-align: center;">
+        <div style="font-size: 3rem; margin-bottom: 8px;" id="qualityMissionIcon"></div>
+        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 4px;" id="qualityMissionName"></div>
+        <div style="font-size: 0.9rem; color: var(--text-muted); font-style: italic;" id="qualityMissionDesc"></div>
+      </div>
+      <div class="quality-options" id="qualityOptions"></div>
+    </div>
+  </div>
+
+  <!-- Modal Adicionar Criança -->
+  <div id="addChildModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>➕ Adicionar Criança</h3>
+        <button class="close-btn" onclick="closeAddChildModal()">✕</button>
+      </div>
+      <form onsubmit="addChild(event)">
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Nome:</label>
+          <input type="text" id="childNameInput" required style="width: 100%; padding: 12px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 1rem;">
+        </div>
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 600;">Escolha o mascote:</label>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+            <label style="text-align: center; cursor: pointer;">
+              <input type="radio" name="avatar" value="⭐" required style="display: none;">
+              <div class="avatar-option" style="font-size: 3rem; padding: 12px; border: 3px solid #E5E7EB; border-radius: 12px; transition: all 0.2s;">⭐</div>
+            </label>
+            <label style="text-align: center; cursor: pointer;">
+              <input type="radio" name="avatar" value="🐉" style="display: none;">
+              <div class="avatar-option" style="font-size: 3rem; padding: 12px; border: 3px solid #E5E7EB; border-radius: 12px; transition: all 0.2s;">🐉</div>
+            </label>
+            <label style="text-align: center; cursor: pointer;">
+              <input type="radio" name="avatar" value="🦄" style="display: none;">
+              <div class="avatar-option" style="font-size: 3rem; padding: 12px; border: 3px solid #E5E7EB; border-radius: 12px; transition: all 0.2s;">🦄</div>
+            </label>
+            <label style="text-align: center; cursor: pointer;">
+              <input type="radio" name="avatar" value="🦁" style="display: none;">
+              <div class="avatar-option" style="font-size: 3rem; padding: 12px; border: 3px solid #E5E7EB; border-radius: 12px; transition: all 0.2s;">🦁</div>
+            </label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Adicionar</button>
+      </form>
+    </div>
+  </div>
 
   <script>
-    // =============================
-    // Estado & Persistência
-    // =============================
-    const elements = {
-      energiaVal: document.getElementById('energia-val'),
-      higieneVal: document.getElementById('higiene-val'),
-      felicidadeVal: document.getElementById('felicidade-val'),
-      pontosVal: document.getElementById('pontos-val'),
-      energiaBar: document.getElementById('energia-bar'),
-      higieneBar: document.getElementById('higiene-bar'),
-      felicidadeBar: document.getElementById('felicidade-bar'),
-      stdList: document.getElementById('standard-missions'),
-      extList: document.getElementById('extra-activities-list'),
-      achievements: document.getElementById('achievements')
+    // Dados do aplicativo
+    let appData = {
+      children: [],
+      activities: [],
+      achievements: []
     };
 
-    function showToast(msg){
-      const el = document.getElementById('toast');
-      el.textContent = msg;
-      el.style.display = 'block';
-      setTimeout(()=> el.style.display='none', 2600);
-    }
+    let currentChild = null;
+    let currentMission = null;
 
-    const PADRAO = [
-      { id:'STD01', nome:'Fortaleza da Alvorada', desc:'Recarregue o Cristal da Força', bot1:'Refeição Completa', bot2:'Lanche Rápido', pontos:20, effects:{energia:+10, felicidade:+5} },
-      { id:'STD02', nome:'Escudo de Menta', desc:'Derrote o Bafodonte', bot1:'Escovação Completa', bot2:'Pular Missão', pontos:15, effects:{higiene:+15, felicidade:+5} },
-      { id:'STD03', nome:'Cascata Purificante', desc:'Ative a Barreira Protetora', bot1:'Banho Completo', bot2:'Banho Rápido', pontos:20, effects:{higiene:+20, felicidade:+5} },
-      { id:'STD04', nome:'Fonte dos Sonhos', desc:'Recarregue todos os Cristais', bot1:'Dormir na Hora', bot2:'Dormir Tarde', pontos:25, effects:{energia:+25, felicidade:+10} }
+    // Atividades padrão com nomenclatura lúdica
+    const defaultActivities = [
+      // Missões Principais
+      { 
+        id: 'act_001', 
+        nome: 'Fortaleza da Alvorada', 
+        descricao: 'Recarregue o Cristal da Força',
+        categoria: 'Alimentação', 
+        icone: '🏰', 
+        duracaoMin: 20, 
+        horarioSugerido: 'manhã/tarde/noite', 
+        pontos: 20, 
+        efeitos: { energia: 20, felicidade: 10 },
+        opcoes: [
+          { nome: 'Refeição Completa', qualidade: 100, descricao: 'Comeu tudo, incluindo vegetais' },
+          { nome: 'Lanche Rápido', qualidade: 50, descricao: 'Comeu metade, deixou vegetais' }
+        ]
+      },
+      { 
+        id: 'act_002', 
+        nome: 'Escudo de Menta', 
+        descricao: 'Derrote o Bafodonte',
+        categoria: 'Higiene Bucal', 
+        icone: '🛡️', 
+        duracaoMin: 2, 
+        horarioSugerido: 'manhã/noite', 
+        pontos: 15, 
+        efeitos: { higiene: 10, saudeBucal: 20, felicidade: 5 },
+        opcoes: [
+          { nome: 'Escovação Completa', qualidade: 100, descricao: 'Escovou 2 min, todos os dentes' },
+          { nome: 'Pular Missão', qualidade: 0, descricao: 'Não escovou os dentes' }
+        ]
+      },
+      { 
+        id: 'act_003', 
+        nome: 'Cascata Purificante', 
+        descricao: 'Ative a Barreira Protetora',
+        categoria: 'Banho', 
+        icone: '💧', 
+        duracaoMin: 10, 
+        horarioSugerido: 'manhã/noite', 
+        pontos: 20, 
+        efeitos: { higiene: 25, felicidade: 10 },
+        opcoes: [
+          { nome: 'Banho Completo', qualidade: 100, descricao: 'Lavou corpo e cabelo completamente' },
+          { nome: 'Banho Rápido', qualidade: 50, descricao: 'Banho superficial, não lavou cabelo' }
+        ]
+      },
+      { 
+        id: 'act_004', 
+        nome: 'Fonte dos Sonhos', 
+        descricao: 'Recarregue todos os Cristais',
+        categoria: 'Sono', 
+        icone: '🌙', 
+        duracaoMin: 480, 
+        horarioSugerido: 'noite', 
+        pontos: 25, 
+        efeitos: { energia: 15, felicidade: 15 },
+        opcoes: [
+          { nome: 'Dormir na Hora', qualidade: 100, descricao: 'Foi para cama no horário, dormiu 8-10h' },
+          { nome: 'Dormir Tarde', qualidade: 50, descricao: 'Resistiu, dormiu menos de 8h' }
+        ]
+      },
+
+      // Atividades Adicionais
+      { 
+        id: 'act_005', 
+        nome: 'Santuário Organizado', 
+        descricao: 'Prepare o Templo do Descanso',
+        categoria: 'Casa', 
+        icone: '🛏️', 
+        duracaoMin: 5, 
+        horarioSugerido: 'manhã', 
+        pontos: 10, 
+        efeitos: { felicidade: 5 },
+        opcoes: [
+          { nome: 'Arrumei Direitinho', qualidade: 100, descricao: 'Cama arrumada com lençol e travesseiro' },
+          { nome: 'Só Puxei o Cobertor', qualidade: 50, descricao: 'Apenas puxou o cobertor por cima' }
+        ]
+      },
+      { 
+        id: 'act_006', 
+        nome: 'Ritual Matinal', 
+        descricao: 'Desperte o Guardião Interior',
+        categoria: 'Autocuidado', 
+        icone: '🧼', 
+        duracaoMin: 7, 
+        horarioSugerido: 'manhã', 
+        pontos: 15, 
+        efeitos: { higiene: 15, felicidade: 5 },
+        opcoes: [
+          { nome: 'Ritual Completo', qualidade: 100, descricao: 'Lavou rosto, penteou cabelo' },
+          { nome: 'Ritual Rápido', qualidade: 50, descricao: 'Apenas lavou o rosto' }
+        ]
+      },
+      { 
+        id: 'act_007', 
+        nome: 'Preparação do Herói', 
+        descricao: 'Equipe seus Itens Mágicos',
+        categoria: 'Escola', 
+        icone: '🎒', 
+        duracaoMin: 8, 
+        horarioSugerido: 'manhã/noite', 
+        pontos: 15, 
+        efeitos: { felicidade: 10 },
+        opcoes: [
+          { nome: 'Tudo Pronto', qualidade: 100, descricao: 'Materiais, lanche e garrafinha' },
+          { nome: 'Faltou Algo', qualidade: 50, descricao: 'Esqueceu algum item' }
+        ]
+      },
+      { 
+        id: 'act_008', 
+        nome: 'Sabedoria Antiga', 
+        descricao: 'Desvende os Pergaminhos',
+        categoria: 'Estudo', 
+        icone: '📖', 
+        duracaoMin: 10, 
+        horarioSugerido: 'tarde/noite', 
+        pontos: 20, 
+        efeitos: { felicidade: 15 },
+        opcoes: [
+          { nome: 'Li 10 Minutos', qualidade: 100, descricao: 'Leu 10 min ou 4-6 páginas' },
+          { nome: 'Li um Pouco', qualidade: 50, descricao: 'Leu menos de 5 minutos' }
+        ]
+      },
+      { 
+        id: 'act_009', 
+        nome: 'Treino do Guerreiro', 
+        descricao: 'Fortaleça seu Corpo e Mente',
+        categoria: 'Saúde', 
+        icone: '💪', 
+        duracaoMin: 8, 
+        horarioSugerido: 'manhã/tarde', 
+        pontos: 20, 
+        efeitos: { energia: 15, felicidade: 10 },
+        opcoes: [
+          { nome: 'Treino Completo', qualidade: 100, descricao: '3 x 30s de exercícios' },
+          { nome: 'Treino Curto', qualidade: 50, descricao: 'Fez menos exercícios' }
+        ]
+      },
+      { 
+        id: 'act_010', 
+        nome: 'Ordem no Reino', 
+        descricao: 'Restaure a Harmonia do Espaço',
+        categoria: 'Casa', 
+        icone: '🧹', 
+        duracaoMin: 5, 
+        horarioSugerido: 'tarde/noite', 
+        pontos: 10, 
+        efeitos: { felicidade: 8 },
+        opcoes: [
+          { nome: 'Tudo Arrumado', qualidade: 100, descricao: 'Brinquedos guardados, roupas no cesto' },
+          { nome: 'Arrumação Rápida', qualidade: 50, descricao: 'Arrumou apenas parte' }
+        ]
+      },
+      { 
+        id: 'act_011', 
+        nome: 'Desafio dos Números', 
+        descricao: 'Resolva os Enigmas Matemáticos',
+        categoria: 'Estudo', 
+        icone: '🔢', 
+        duracaoMin: 10, 
+        horarioSugerido: 'tarde', 
+        pontos: 20, 
+        efeitos: { felicidade: 12 },
+        opcoes: [
+          { nome: 'Resolvi Tudo', qualidade: 100, descricao: 'Resolveu 3 contas ou 1 problema' },
+          { nome: 'Resolvi Parte', qualidade: 50, descricao: 'Resolveu parcialmente' }
+        ]
+      },
+      { 
+        id: 'act_012', 
+        nome: 'Ato de Bondade', 
+        descricao: 'Espalhe Luz pelo Reino',
+        categoria: 'Socioemocional', 
+        icone: '💖', 
+        duracaoMin: 3, 
+        horarioSugerido: 'qualquer', 
+        pontos: 15, 
+        efeitos: { felicidade: 20 },
+        opcoes: [
+          { nome: 'Fiz Algo Gentil', qualidade: 100, descricao: 'Ajudou alguém espontaneamente' },
+          { nome: 'Tentei Ajudar', qualidade: 50, descricao: 'Ajudou quando pedido' }
+        ]
+      },
+
+      // Missões Comportamentais (NOVO)
+      { 
+        id: 'act_013', 
+        nome: 'Guardião da Paz', 
+        descricao: 'Proteja a Harmonia do Reino',
+        categoria: 'Comportamento', 
+        icone: '😇', 
+        duracaoMin: 0, 
+        horarioSugerido: 'qualquer', 
+        pontos: 25, 
+        efeitos: { felicidade: 25 },
+        opcoes: [
+          { nome: 'Dia Perfeito', qualidade: 100, descricao: 'Nenhuma birra, aceitou "não" com maturidade' },
+          { nome: 'Pequenos Deslizes', qualidade: 50, descricao: '1-2 birras pequenas, mas acalmou-se' }
+        ]
+      },
+      { 
+        id: 'act_014', 
+        nome: 'Ouvinte Sábio', 
+        descricao: 'Siga o Conselho dos Anciãos',
+        categoria: 'Comportamento', 
+        icone: '👂', 
+        duracaoMin: 0, 
+        horarioSugerido: 'qualquer', 
+        pontos: 20, 
+        efeitos: { felicidade: 20 },
+        opcoes: [
+          { nome: 'Obedeci na Primeira', qualidade: 100, descricao: 'Obedeceu na primeira vez' },
+          { nome: 'Obedeci Depois', qualidade: 50, descricao: 'Obedeceu após insistência' }
+        ]
+      },
+      { 
+        id: 'act_015', 
+        nome: 'Espírito Colaborativo', 
+        descricao: 'Una Forças com Aliados',
+        categoria: 'Comportamento', 
+        icone: '🤝', 
+        duracaoMin: 0, 
+        horarioSugerido: 'qualquer', 
+        pontos: 15, 
+        efeitos: { felicidade: 15 },
+        opcoes: [
+          { nome: 'Ajudei Muito', qualidade: 100, descricao: 'Ajudou espontaneamente 3x' },
+          { nome: 'Ajudei Quando Pediram', qualidade: 50, descricao: 'Ajudou quando pedido' }
+        ]
+      },
+      { 
+        id: 'act_016', 
+        nome: 'Mestre da Calma', 
+        descricao: 'Domine suas Emoções',
+        categoria: 'Comportamento', 
+        icone: '😌', 
+        duracaoMin: 0, 
+        horarioSugerido: 'qualquer', 
+        pontos: 20, 
+        efeitos: { felicidade: 20 },
+        opcoes: [
+          { nome: 'Mantive a Calma', qualidade: 100, descricao: 'Controlou raiva/frustração sozinho' },
+          { nome: 'Acalmei com Ajuda', qualidade: 50, descricao: 'Acalmou-se com ajuda dos pais' }
+        ]
+      },
+      { 
+        id: 'act_017', 
+        nome: 'Comunicador Gentil', 
+        descricao: 'Use Palavras de Poder Positivo',
+        categoria: 'Comportamento', 
+        icone: '🗣️', 
+        duracaoMin: 0, 
+        horarioSugerido: 'qualquer', 
+        pontos: 15, 
+        efeitos: { felicidade: 15 },
+        opcoes: [
+          { nome: 'Falei com Respeito', qualidade: 100, descricao: 'Sem gritos ou grosseria' },
+          { nome: 'Pedi Desculpas', qualidade: 50, descricao: 'Errou mas pediu desculpas' }
+        ]
+      },
+      { 
+        id: 'act_018', 
+        nome: 'Missão da Lição', 
+        descricao: 'Complete os Desafios Escolares',
+        categoria: 'Estudo', 
+        icone: '📚', 
+        duracaoMin: 30, 
+        horarioSugerido: 'tarde', 
+        pontos: 25, 
+        efeitos: { felicidade: 10 },
+        opcoes: [
+          { nome: 'Fiz Tudo', qualidade: 100, descricao: 'Completou toda a lição' },
+          { nome: 'Fiz Parte', qualidade: 50, descricao: 'Fez apenas parte da lição' }
+        ]
+      }
     ];
-    const PADRAO_NOMES = new Set(PADRAO.map(x=>x.nome));
 
-    const gameState = {
-      energia: 80, higiene: 70, felicidade: 65,
-      pontosTotal: 25, missoesConcluidas: 2,
-      conquistas: [], lastDayISO: null
-    };
+    // Conquistas padrão
+    const defaultAchievements = [
+      { id: 'ach_001', nome: 'Primeira Missão', descricao: 'Complete sua primeira atividade', icone: '🎯', requisito: { tipo: 'missoes', valor: 1 } },
+      { id: 'ach_002', nome: 'Em Chamas', descricao: 'Mantenha 3 dias consecutivos', icone: '🔥', requisito: { tipo: 'streak', valor: 3 } },
+      { id: 'ach_003', nome: 'Super Estrela', descricao: 'Alcance o nível 5', icone: '⭐', requisito: { tipo: 'nivel', valor: 5 } },
+      { id: 'ach_004', nome: 'Imparável', descricao: 'Complete 10 atividades', icone: '🚀', requisito: { tipo: 'missoes', valor: 10 } },
+      { id: 'ach_005', nome: 'Lenda', descricao: 'Mantenha 7 dias consecutivos', icone: '👑', requisito: { tipo: 'streak', valor: 7 } },
+      { id: 'ach_006', nome: 'Herói Perfeito', descricao: '7 dias com todas as barras > 80%', icone: '🌟', requisito: { tipo: 'barras_altas', valor: 7 } },
+      { id: 'ach_007', nome: 'Anjo da Casa', descricao: '5 dias seguidos sem birras', icone: '😇', requisito: { tipo: 'sem_birras', valor: 5 } },
+      { id: 'ach_008', nome: 'Sorriso Brilhante', descricao: '10 dias escovando perfeitamente', icone: '🦷', requisito: { tipo: 'escovacao_perfeita', valor: 10 } }
+    ];
 
-    function saveProgress(){
-      try{ localStorage.setItem('heroesRoutineProgress', JSON.stringify(gameState)); }
-      catch(e){ console.warn('Falha ao salvar:', e); }
+    // Carregar dados do localStorage
+    function loadData() {
+      const saved = localStorage.getItem('familykids_completo_v2');
+      if (saved) {
+        appData = JSON.parse(saved);
+      } else {
+        appData.activities = defaultActivities;
+        appData.achievements = defaultAchievements;
+        saveData();
+      }
     }
-    function loadProgress(){
-      try{
-        const raw = localStorage.getItem('heroesRoutineProgress');
-        if (raw){
-          const st = JSON.parse(raw); Object.assign(gameState, st||{});
-        }
-      }catch(e){ console.warn('Falha ao carregar:', e); }
-    }
-    loadProgress();
 
-    function clamp(v){ return Math.max(0, Math.min(100, v)); }
-    function updateStatusBars(){
-      elements.energiaVal.textContent = clamp(gameState.energia);
-      elements.higieneVal.textContent = clamp(gameState.higiene);
-      elements.felicidadeVal.textContent = clamp(gameState.felicidade);
-      elements.pontosVal.textContent = gameState.pontosTotal||0;
-
-      elements.energiaBar.style.width = clamp(gameState.energia) + '%';
-      elements.higieneBar.style.width = clamp(gameState.higiene) + '%';
-      elements.felicidadeBar.style.width = clamp(gameState.felicidade) + '%';
+    // Salvar dados no localStorage
+    function saveData() {
+      localStorage.setItem('familykids_completo_v2', JSON.stringify(appData));
     }
-    updateStatusBars();
 
     // =============================
-    // Render: Missões padrão
+    // Funções de Navegação
     // =============================
-    function renderStandard(){
-      const root = elements.stdList; root.innerHTML='';
-      PADRAO.forEach(m=>{
+    function showScreen(screenId) {
+      document.querySelectorAll('.profile-selection, .child-screen, .parent-screen').forEach(el => el.classList.add('hidden'));
+      document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    function exitChildMode() {
+      currentChild = null;
+      showScreen('profileSelection');
+    }
+
+    function exitParentMode() {
+      showScreen('profileSelection');
+    }
+
+    // =============================
+    // Tela de Seleção de Perfil
+    // =============================
+    function renderProfiles() {
+      const grid = document.getElementById('profilesGrid');
+      grid.innerHTML = '';
+
+      // Perfis das crianças
+      appData.children.forEach(child => {
+        const btn = document.createElement('button');
+        btn.className = 'profile-btn';
+        btn.onclick = () => openChildMode(child.id);
+        btn.innerHTML = `
+          <span class="emoji">${child.avatar}</span>
+          <span class="name">${child.nome}</span>
+          <span class="level">Nível ${child.nivel}</span>
+        `;
+        grid.appendChild(btn);
+      });
+
+      // Botão Painel dos Pais
+      const parentBtn = document.createElement('button');
+      parentBtn.className = 'profile-btn parent-btn';
+      parentBtn.onclick = openParentMode;
+      parentBtn.innerHTML = `
+        <span class="emoji">👨</span>
+        <span class="name">Painel dos Pais</span>
+      `;
+      grid.appendChild(parentBtn);
+
+      // Botão Adicionar Criança
+      const addBtn = document.createElement('button');
+      addBtn.className = 'profile-btn add-child-btn';
+      addBtn.onclick = () => showModal('addChildModal');
+      addBtn.innerHTML = `
+        <span class="emoji">➕</span>
+        <span class="name">Adicionar Criança</span>
+      `;
+      grid.appendChild(addBtn);
+    }
+
+    // =============================
+    // Adicionar Criança
+    // =============================
+    function addChild(event) {
+      event.preventDefault();
+      const nome = document.getElementById('childNameInput').value;
+      const avatar = document.querySelector('input[name="avatar"]:checked').value;
+
+      const newChild = {
+        id: 'child_' + Date.now(),
+        nome,
+        avatar,
+        nivel: 1,
+        pontos: 0,
+        streak: 0,
+        barras: {
+          energia: 100,
+          higiene: 100,
+          saudeBucal: 100,
+          felicidade: 100
+        },
+        estadoVisual: {
+          limpeza: 'limpo',
+          corpo: 'forte',
+          dentes: 'brancos',
+          humor: 'feliz'
+        },
+        missoes: [],
+        comportamentos: [],
+        conquistasDesbloqueadas: []
+      };
+
+      appData.children.push(newChild);
+      saveData();
+      closeAddChildModal();
+      renderProfiles();
+    }
+
+    function closeAddChildModal() {
+      closeModal('addChildModal');
+      document.getElementById('childNameInput').value = '';
+      document.querySelectorAll('input[name="avatar"]').forEach(input => input.checked = false);
+    }
+
+    // Seleção visual de avatar
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('input[name="avatar"]').forEach(input => {
+        input.addEventListener('change', (e) => {
+          document.querySelectorAll('.avatar-option').forEach(opt => {
+            opt.style.borderColor = '#E5E7EB';
+            opt.style.background = 'white';
+          });
+          e.target.nextElementSibling.style.borderColor = '#4F46E5';
+          e.target.nextElementSibling.style.background = '#EEF2FF';
+        });
+      });
+    });
+
+    // =============================
+    // Modo Criança
+    // =============================
+    function openChildMode(childId) {
+      currentChild = appData.children.find(c => c.id === childId);
+      if (!currentChild) return;
+
+      showScreen('childScreen');
+      renderChildScreen();
+    }
+
+    function renderChildScreen() {
+      // Header
+      document.getElementById('childAvatar').textContent = currentChild.avatar;
+      document.getElementById('childName').textContent = currentChild.nome;
+      document.getElementById('childLevel').innerHTML = `<span style="color: #A855F7;">●</span> Nível ${currentChild.nivel}`;
+      document.getElementById('childStreak').innerHTML = `🔥 Streak: ${currentChild.streak}`;
+      document.getElementById('childPoints').innerHTML = `⭐ ${currentChild.pontos} pts`;
+
+      // Avatar e Barras
+      updateAvatarDisplay();
+      updateStatusBars();
+      checkStatusAlerts();
+
+      // Missões
+      renderMissions();
+
+      // Conquistas
+      renderAchievements();
+    }
+
+    // =============================
+    // Avatar com Degradação Visual
+    // =============================
+    function updateAvatarDisplay() {
+      const { energia, higiene, saudeBucal, felicidade } = currentChild.barras;
+      
+      // Determinar estado visual
+      let avatarEmoji = currentChild.avatar;
+      let effects = '';
+      let statusText = '';
+
+      // Lógica de degradação visual
+      if (energia < 20) {
+        avatarEmoji = '🤒'; // Muito fraco
+        effects = '⚠️';
+        statusText = 'Seu herói está muito fraco e definhando!';
+      } else if (energia < 50) {
+        avatarEmoji = '😰'; // Magrinho, cansado
+        effects = '💤';
+        statusText = 'Seu herói está cansado e com pouca energia.';
+      } else if (higiene < 20) {
+        avatarEmoji = '🤢'; // Muito sujo
+        effects = '💩';
+        statusText = 'Seu herói está muito sujo!';
+      } else if (higiene < 50) {
+        avatarEmoji = '😟'; // Sujo
+        effects = '☁️';
+        statusText = 'Seu herói precisa de um banho.';
+      } else if (saudeBucal < 20) {
+        avatarEmoji = '🦷'; // Dentes podres
+        effects = '⚠️';
+        statusText = 'Os dentes do seu herói estão ficando podres!';
+      } else if (saudeBucal < 50) {
+        avatarEmoji = '😬'; // Dentes amarelos
+        effects = '⚠️';
+        statusText = 'Os dentes do seu herói estão amarelados.';
+      } else if (felicidade < 20) {
+        avatarEmoji = '😡'; // Irritado
+        effects = '⚡';
+        statusText = 'Seu herói está muito irritado e triste.';
+      } else if (felicidade < 50) {
+        avatarEmoji = '😢'; // Triste
+        effects = '☁️';
+        statusText = 'Seu herói está triste.';
+      } else if (energia >= 80 && higiene >= 80 && saudeBucal >= 80 && felicidade >= 80) {
+        avatarEmoji = currentChild.avatar; // Saudável
+        effects = '✨';
+        statusText = 'Seu herói está forte, limpo e feliz!';
+      } else {
+        avatarEmoji = currentChild.avatar;
+        effects = '';
+        statusText = 'Seu herói está bem.';
+      }
+
+      document.getElementById('avatarCharacter').textContent = avatarEmoji;
+      document.getElementById('avatarEffects').textContent = effects;
+      document.getElementById('avatarStatusText').textContent = statusText;
+    }
+
+    // =============================
+    // Barras de Status
+    // =============================
+    function updateStatusBars() {
+      const { energia, higiene, saudeBucal, felicidade } = currentChild.barras;
+
+      updateBar('energia', energia);
+      updateBar('higiene', higiene);
+      updateBar('saudeBucal', saudeBucal);
+      updateBar('felicidade', felicidade);
+    }
+
+    function updateBar(type, value) {
+      const bar = document.getElementById(type + 'Bar');
+      const valueEl = document.getElementById(type + 'Value');
+      
+      bar.style.width = value + '%';
+      valueEl.textContent = Math.round(value) + '%';
+
+      // Mudar cor se estiver baixo
+      if (value < 30) {
+        bar.style.background = 'linear-gradient(90deg, #EF4444, #DC2626)';
+      }
+    }
+
+    // =============================
+    // Alertas de Status
+    // =============================
+    function checkStatusAlerts() {
+      const alertsContainer = document.getElementById('statusAlerts');
+      alertsContainer.innerHTML = '';
+
+      const { energia, higiene, saudeBucal, felicidade } = currentChild.barras;
+
+      if (higiene < 30) {
+        alertsContainer.innerHTML += `
+          <div class="status-alert">
+            <span class="icon">⚠️</span>
+            <div class="content">
+              <h4>Higiene Baixa!</h4>
+              <p>Seu herói está ficando sujo! As criaturas das sombras podem sentir o cheiro. Que tal ativar a Cascata Purificante?</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (energia < 30) {
+        alertsContainer.innerHTML += `
+          <div class="status-alert">
+            <span class="icon">⚠️</span>
+            <div class="content">
+              <h4>Energia Baixa!</h4>
+              <p>Seu herói está fraco e definhando! Sem a Fortaleza da Alvorada, ele não terá forças para as missões. Vamos comer?</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (saudeBucal < 30) {
+        alertsContainer.innerHTML += `
+          <div class="status-alert">
+            <span class="icon">⚠️</span>
+            <div class="content">
+              <h4>Saúde Bucal Crítica!</h4>
+              <p>O Bafodonte está vencendo! Os dentes do seu herói estão ficando escuros. Use o Escudo de Menta urgentemente!</p>
+            </div>
+          </div>
+        `;
+      }
+
+      if (felicidade < 30) {
+        alertsContainer.innerHTML += `
+          <div class="status-alert">
+            <span class="icon">⚠️</span>
+            <div class="content">
+              <h4>Felicidade Baixa!</h4>
+              <p>Seu herói está triste e sem brilho. Birras e desobediência roubam a luz interior. Que tal ser o Guardião da Paz hoje?</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // =============================
+    // Missões
+    // =============================
+    function renderMissions() {
+      const container = document.getElementById('missionsContainer');
+      container.innerHTML = '';
+
+      const today = new Date().toISOString().split('T')[0];
+
+      appData.activities.forEach(activity => {
+        const missaoHoje = currentChild.missoes.find(m => m.activityId === activity.id && m.data === today);
+        
         const card = document.createElement('div');
         card.className = 'mission-card';
-        card.innerHTML = `
-          <div class="mission-info">
-            <div class="mission-title">${m.nome}</div>
-            <div class="mission-desc">${m.desc}</div>
-          </div>
-          <div class="actions-row">
-            <button class="btn btn-primary" data-a="ok">${m.bot1}</button>
-            <button class="btn btn-secondary" data-a="skip">${m.bot2}</button>
-          </div>`;
-        card.querySelector('[data-a="ok"]').addEventListener('click', ()=>{
-          gameState.pontosTotal = (gameState.pontosTotal||0) + m.pontos;
-          if (m.effects){
-            gameState.energia = clamp((gameState.energia||0) + (m.effects.energia||0));
-            gameState.higiene = clamp((gameState.higiene||0) + (m.effects.higiene||0));
-            gameState.felicidade = clamp((gameState.felicidade||0) + (m.effects.felicidade||0));
+        
+        if (missaoHoje) {
+          if (missaoHoje.qualidade === 100) {
+            card.classList.add('completed');
+          } else if (missaoHoje.qualidade === 50) {
+            card.classList.add('partial');
           }
-          gameState.missoesConcluidas = (gameState.missoesConcluidas||0) + 1;
-          updateStatusBars(); saveProgress();
-          showToast(`✅ ${m.nome} concluída! +${m.pontos} pontos`);
-          card.style.opacity=.5; card.style.pointerEvents='none';
-        });
-        card.querySelector('[data-a="skip"]').addEventListener('click', ()=>{
-          showToast(`⏭️ ${m.nome} pulada`);
-          card.style.opacity=.6;
-        });
-        root.appendChild(card);
-      });
-    }
-    renderStandard();
-
-    // =============================
-    // Render: Atividades adicionais (JSON)
-    // =============================
-    window.atividades = window.atividades || []; // fonte dinâmica após JSON
-
-    function normalizarAtividade(a){
-      return {
-        id: a.id || ('AUX_'+Math.random().toString(36).slice(2)),
-        nome: a.nome || '',
-        categoria: a.categoria || 'Geral',
-        criterios: Array.isArray(a.criterios) ? a.criterios : [],
-        recompensaPontos: Number.isFinite(a.recompensaPontos) ? a.recompensaPontos : 10,
-        duracaoMin: Number.isFinite(a.duracaoMin) ? a.duracaoMin : 5,
-        horarioSugerido: a.horarioSugerido || '',
-        badgeAoCompletar: a.badgeAoCompletar || null
-      };
-    }
-
-    function criarCardExtra(a){
-      const wrap = document.createElement('div');
-      wrap.className = 'mission-card extra-card';
-      wrap.innerHTML = `
-        <div class="mission-info">
-          <div class="mission-title">${a.nome}</div>
-          <div class="mission-desc">
-            ${a.categoria} • ${a.duracaoMin} min ${a.horarioSugerido ? '• '+a.horarioSugerido : ''}
-            ${a.criterios.length ? '<br><small>Critérios: '+a.criterios.join(', ')+'</small>' : ''}
-          </div>
-        </div>
-        <div class="actions-row">
-          <button class="btn btn-primary" data-action="concluir">Concluir (+${a.recompensaPontos})</button>
-          <button class="btn btn-secondary" data-action="pular">Pular</button>
-        </div>
-      `;
-      wrap.querySelector('[data-action="concluir"]').addEventListener('click', ()=>{
-        gameState.pontosTotal = (gameState.pontosTotal||0) + a.recompensaPontos;
-        gameState.missoesConcluidas = (gameState.missoesConcluidas||0) + 1;
-        updateStatusBars(); saveProgress();
-        showToast(`✅ ${a.nome} concluída! +${a.recompensaPontos} pontos`);
-        wrap.style.opacity=.5; wrap.style.pointerEvents='none';
-      });
-      wrap.querySelector('[data-action="pular"]').addEventListener('click', ()=>{
-        showToast(`⏭️ ${a.nome} pulada`);
-        wrap.style.opacity=.6;
-      });
-      return wrap;
-    }
-
-    function renderExtraActivities(){
-      const listEl = elements.extList; if (!listEl) return;
-      let base = Array.isArray(window.atividades) ? window.atividades : (Array.isArray(window.externalActivities)? window.externalActivities : []);
-      const items = base.map(normalizarAtividade).filter(x=>x.nome && !PADRAO_NOMES.has(x.nome));
-      listEl.innerHTML='';
-      if (!items.length){
-        listEl.innerHTML = '<div class="mission-card extra-card"><div class="mission-info"><div class="mission-title">Sem atividades adicionais</div><div class="mission-desc">Atualize o <code>activities.json</code>.</div></div></div>';
-        return;
-      }
-      items.forEach(a=> listEl.appendChild(criarCardExtra(a)));
-    }
-
-    window.renderizarAtividades = function(){ renderExtraActivities(); }; // compat
-    window.addEventListener('external-activities-loaded', renderExtraActivities);
-    window.addEventListener('activities-merged', renderExtraActivities);
-    window.addEventListener('activities-overwritten', renderExtraActivities);
-
-    // =============================
-    // Loader OVERWRITE do activities.json
-    // =============================
-    (function(){
-      async function overwriteActivities(){
-        try{
-          const resp = await fetch('activities.json', { cache: 'no-store' });
-          if(!resp.ok) throw new Error('HTTP '+resp.status);
-          const novas = await resp.json();
-          if (!Array.isArray(novas) || !novas.length){
-            console.warn('[Overwrite] activities.json vazio ou inválido'); return;
-          }
-          // sobrescreve totalmente a fonte dinâmica
-          window.atividades = novas.slice();
-          // migra storage de forma suave
-          try{
-            const KEY='heroesRoutineProgress';
-            const raw=localStorage.getItem(KEY);
-            const st= raw? JSON.parse(raw):{};
-            st.atividades = window.atividades;
-            localStorage.setItem(KEY, JSON.stringify(st));
-          }catch(e){ console.warn('[Overwrite] migração storage:', e); }
-
-          // re-render
-          renderExtraActivities();
-          window.dispatchEvent(new CustomEvent('activities-overwritten',{detail:{total:window.atividades.length}}));
-          console.log('[Overwrite] Atividades sobrescritas. Total:', window.atividades.length);
-        }catch(e){
-          console.warn('[Overwrite] Erro ao sobrescrever atividades:', e);
         }
-      }
-      if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', overwriteActivities);
-      else overwriteActivities();
-    })();
 
-    console.log('🌟 Heróis da Rotina - Versão Completa carregado com sucesso!');
-    console.log('Estado inicial:', JSON.parse(JSON.stringify(gameState)));
+        let badgeHTML = '';
+        if (missaoHoje) {
+          if (missaoHoje.qualidade === 100) {
+            badgeHTML = '<div class="quality-badge perfect">🌟 100% Perfeito!</div>';
+          } else if (missaoHoje.qualidade === 50) {
+            badgeHTML = '<div class="quality-badge partial">⚠️ 50% Parcial</div>';
+          } else if (missaoHoje.qualidade === 0) {
+            badgeHTML = '<div class="quality-badge none">❌ 0% Não Fiz</div>';
+          }
+        }
+
+        card.innerHTML = `
+          <div class="mission-header">
+            <div class="mission-info">
+              <div class="mission-title">
+                <span>${activity.icone}</span>
+                <span>${activity.nome}</span>
+              </div>
+              <div class="mission-description">${activity.descricao}</div>
+              <div class="mission-meta">
+                <span>📁 ${activity.categoria}</span>
+                ${activity.duracaoMin > 0 ? `<span>⏱️ ${activity.duracaoMin} min</span>` : ''}
+                <span>🕐 ${activity.horarioSugerido}</span>
+                <span>⭐ +${activity.pontos} pts</span>
+              </div>
+              ${badgeHTML}
+            </div>
+            <div class="mission-actions">
+              ${missaoHoje ? 
+                `<button class="btn btn-success" disabled>✅ Concluída</button>` :
+                `<button class="btn btn-primary" onclick="openQualityModal('${activity.id}')">✅ Concluir</button>`
+              }
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // =============================
+    // Modal de Qualidade
+    // =============================
+    function openQualityModal(activityId) {
+      const activity = appData.activities.find(a => a.id === activityId);
+      if (!activity) return;
+
+      currentMission = activity;
+
+      document.getElementById('qualityMissionIcon').textContent = activity.icone;
+      document.getElementById('qualityMissionName').textContent = activity.nome;
+      document.getElementById('qualityMissionDesc').textContent = activity.descricao;
+
+      const optionsContainer = document.getElementById('qualityOptions');
+      optionsContainer.innerHTML = '';
+
+      activity.opcoes.forEach(opcao => {
+        const pontosGanhos = Math.round((activity.pontos * opcao.qualidade) / 100);
+        const efeitosTexto = Object.entries(activity.efeitos)
+          .map(([key, value]) => {
+            const valorAjustado = Math.round((value * opcao.qualidade) / 100);
+            const icone = key === 'energia' ? '⚡' : key === 'higiene' ? '🧼' : key === 'saudeBucal' ? '🦷' : '💖';
+            const nome = key === 'energia' ? 'energia' : key === 'higiene' ? 'higiene' : key === 'saudeBucal' ? 'saúde bucal' : 'felicidade';
+            return `${icone} +${valorAjustado} ${nome}`;
+          })
+          .join(', ');
+
+        const option = document.createElement('div');
+        option.className = 'quality-option';
+        option.onclick = () => completeMission(opcao.qualidade);
+        
+        const iconeOpcao = opcao.qualidade === 100 ? '🌟' : opcao.qualidade === 50 ? '⚠️' : '❌';
+        
+        option.innerHTML = `
+          <div class="header">
+            <span class="icon">${iconeOpcao}</span>
+            <span class="title">${opcao.nome} (${opcao.qualidade}%)</span>
+            <span class="points">+${pontosGanhos} pts</span>
+          </div>
+          <div class="description">${opcao.descricao}</div>
+          <div class="effects">${efeitosTexto}</div>
+        `;
+
+        optionsContainer.appendChild(option);
+      });
+
+      showModal('qualityModal');
+    }
+
+    function closeQualityModal() {
+      closeModal('qualityModal');
+      currentMission = null;
+    }
+
+    function completeMission(qualidade) {
+      if (!currentMission || !currentChild) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      const pontosGanhos = Math.round((currentMission.pontos * qualidade) / 100);
+
+      // Adicionar missão concluída
+      currentChild.missoes.push({
+        activityId: currentMission.id,
+        data: today,
+        qualidade,
+        pontos: pontosGanhos
+      });
+
+      // Atualizar pontos
+      currentChild.pontos += pontosGanhos;
+
+      // Atualizar barras
+      Object.entries(currentMission.efeitos).forEach(([key, value]) => {
+        const valorAjustado = Math.round((value * qualidade) / 100);
+        currentChild.barras[key] = Math.min(100, Math.max(0, currentChild.barras[key] + valorAjustado));
+      });
+
+      // Atualizar nível
+      const novoNivel = Math.floor(currentChild.pontos / 100) + 1;
+      if (novoNivel > currentChild.nivel) {
+        currentChild.nivel = novoNivel;
+      }
+
+      // Verificar conquistas
+      checkAchievements();
+
+      saveData();
+      closeQualityModal();
+      renderChildScreen();
+    }
+
+    // =============================
+    // Conquistas
+    // =============================
+    function renderAchievements() {
+      const container = document.getElementById('achievementsContainer');
+      container.innerHTML = '';
+
+      appData.achievements.forEach(achievement => {
+        const desbloqueada = currentChild.conquistasDesbloqueadas.includes(achievement.id);
+        
+        const card = document.createElement('div');
+        card.className = 'mission-card';
+        if (desbloqueada) {
+          card.classList.add('completed');
+        }
+
+        card.innerHTML = `
+          <div class="mission-header">
+            <div class="mission-info">
+              <div class="mission-title">
+                <span>${achievement.icone}</span>
+                <span>${achievement.nome}</span>
+              </div>
+              <div class="mission-description">${achievement.descricao}</div>
+            </div>
+            <div class="mission-actions">
+              ${desbloqueada ? 
+                '<span class="quality-badge perfect">✅ Desbloqueada</span>' :
+                '<span class="quality-badge none">🔒 Bloqueada</span>'
+              }
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function checkAchievements() {
+      appData.achievements.forEach(achievement => {
+        if (currentChild.conquistasDesbloqueadas.includes(achievement.id)) return;
+
+        let desbloqueada = false;
+
+        switch (achievement.requisito.tipo) {
+          case 'missoes':
+            if (currentChild.missoes.length >= achievement.requisito.valor) {
+              desbloqueada = true;
+            }
+            break;
+          case 'streak':
+            if (currentChild.streak >= achievement.requisito.valor) {
+              desbloqueada = true;
+            }
+            break;
+          case 'nivel':
+            if (currentChild.nivel >= achievement.requisito.valor) {
+              desbloqueada = true;
+            }
+            break;
+        }
+
+        if (desbloqueada) {
+          currentChild.conquistasDesbloqueadas.push(achievement.id);
+        }
+      });
+    }
+
+    // =============================
+    // Painel dos Pais
+    // =============================
+    function openParentMode() {
+      showScreen('parentScreen');
+      renderParentScreen();
+    }
+
+    function renderParentScreen() {
+      renderChildrenOverview();
+      renderActivitiesManager();
+      renderBehaviorLogger();
+    }
+
+    function renderChildrenOverview() {
+      const container = document.getElementById('childrenOverview');
+      container.innerHTML = '';
+
+      const today = new Date().toISOString().split('T')[0];
+
+      appData.children.forEach(child => {
+        const missoesHoje = child.missoes.filter(m => m.data === today);
+        const totalMissoes = appData.activities.length;
+        const completionRate = totalMissoes > 0 ? Math.round((missoesHoje.length / totalMissoes) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = 'child-card';
+        card.innerHTML = `
+          <span class="avatar">${child.avatar}</span>
+          <div class="info">
+            <div class="name">${child.nome}</div>
+            <div class="progress">${missoesHoje.length}/${totalMissoes} missões</div>
+          </div>
+          <div class="completion">${completionRate}%</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderActivitiesManager() {
+      const container = document.getElementById('activitiesManager');
+      container.innerHTML = '';
+
+      appData.activities.forEach(activity => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display: flex; align-items: center; gap: 12px; padding: 16px; background: #F9FAFB; border-radius: 12px; margin-bottom: 12px;';
+        item.innerHTML = `
+          <span style="font-size: 2rem;">${activity.icone}</span>
+          <div style="flex: 1;">
+            <div style="font-weight: 700; margin-bottom: 4px;">${activity.nome}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">${activity.descricao}</div>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">📁 ${activity.categoria} • ⏱️ ${activity.duracaoMin} min • ⭐ ${activity.pontos} pts</div>
+          </div>
+          <button class="btn btn-secondary" onclick="deleteActivity('${activity.id}')" style="background: #FEE2E2; color: #991B1B;">🗑️ Excluir</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function deleteActivity(activityId) {
+      if (!confirm('Tem certeza que deseja excluir esta atividade?')) return;
+      appData.activities = appData.activities.filter(a => a.id !== activityId);
+      saveData();
+      renderActivitiesManager();
+    }
+
+    function renderBehaviorLogger() {
+      const container = document.getElementById('behaviorLogger');
+      container.innerHTML = '';
+
+      appData.children.forEach(child => {
+        const section = document.createElement('div');
+        section.style.cssText = 'margin-bottom: 24px; padding: 16px; background: #F9FAFB; border-radius: 12px;';
+        section.innerHTML = `
+          <div style="font-weight: 700; margin-bottom: 12px; font-size: 1.1rem;">${child.avatar} ${child.nome}</div>
+          <div style="display: grid; gap: 8px;">
+            <button class="btn btn-secondary" onclick="logBehavior('${child.id}', 'birra')">😤 Registrar Birra</button>
+            <button class="btn btn-secondary" onclick="logBehavior('${child.id}', 'obediencia')">👂 Registrar Obediência</button>
+            <button class="btn btn-secondary" onclick="logBehavior('${child.id}', 'gentileza')">💖 Registrar Gentileza</button>
+          </div>
+        `;
+        container.appendChild(section);
+      });
+    }
+
+    function logBehavior(childId, tipo) {
+      const child = appData.children.find(c => c.id === childId);
+      if (!child) return;
+
+      const descricao = prompt(`Descreva o comportamento (${tipo}):`);
+      if (!descricao) return;
+
+      child.comportamentos.push({
+        tipo,
+        data: new Date().toISOString(),
+        descricao
+      });
+
+      // Ajustar felicidade baseado no comportamento
+      if (tipo === 'birra') {
+        child.barras.felicidade = Math.max(0, child.barras.felicidade - 10);
+      } else if (tipo === 'obediencia' || tipo === 'gentileza') {
+        child.barras.felicidade = Math.min(100, child.barras.felicidade + 10);
+      }
+
+      saveData();
+      alert('Comportamento registrado!');
+    }
+
+    function exportData() {
+      const dataStr = JSON.stringify(appData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'familykids_backup_' + new Date().toISOString().split('T')[0] + '.json';
+      link.click();
+    }
+
+    // =============================
+    // Inicialização
+    // =============================
+    loadData();
+    renderProfiles();
   </script>
 </body>
 </html>

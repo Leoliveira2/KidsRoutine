@@ -602,8 +602,29 @@
 
     // Funções de PIN
     function showPinHelp() {
-      const helpDiv = document.getElementById('pinHelp');
-      helpDiv.classList.toggle('hidden');
+      // Criar novo PIN
+      const newPin = prompt('Digite um novo PIN de 6 dígitos para sua família:\n\n⚠️ IMPORTANTE: Anote este PIN em local seguro!\n\nVocê precisará dele para acessar o app em outros dispositivos.');
+      
+      if (!newPin) {
+        return; // Usuário cancelou
+      }
+      
+      if (newPin.length !== 6 || !/^\d{6}$/.test(newPin)) {
+        alert('❌ O PIN deve ter exatamente 6 dígitos numéricos!\n\nExemplo: 123456');
+        return;
+      }
+      
+      // Confirmar PIN
+      const confirmPin = prompt('Confirme o PIN digitando novamente:');
+      
+      if (confirmPin !== newPin) {
+        alert('❌ Os PINs não coincidem! Tente novamente.');
+        return;
+      }
+      
+      // Definir o PIN e prosseguir
+      document.getElementById('pinInput').value = newPin;
+      handlePinSubmit();
     }
 
     async function handlePinSubmit() {

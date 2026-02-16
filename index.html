@@ -624,6 +624,7 @@
     <div class="missions-section" style="margin-top: 20px;">
       <h2 class="section-title">⚙️ Ações</h2>
       <button class="btn btn-primary" onclick="showMissionEditor()" style="margin-bottom: 12px;">✏️ Editar Missões</button>
+      <button class="btn btn-primary" onclick="syncMissionsWithTemplates()" style="margin-bottom: 12px; background: #10B981;">🔄 Atualizar Missões (Sincronizar)</button>
       <button class="btn btn-primary" onclick="resetAllMissions()" style="margin-bottom: 12px;">🔄 Resetar Todas as Missões (Novo Dia)</button>
       <button class="btn btn-secondary" onclick="exportData()">💾 Exportar Dados</button>
     </div>
@@ -1356,6 +1357,9 @@
               <div style="font-size: 14px; color: #6B7280;">Missões Hoje</div>
               <div style="font-size: 12px; color: #10B981; font-weight: 600; margin-top: 4px;">${percentage}%</div>
               <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">👁️ Clique para ver histórico</div>
+              <button onclick="event.stopPropagation(); deleteChild('${child.id}')" style="margin-top: 12px; background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 600;">
+                🗑️ Excluir
+              </button>
             </div>
           </div>
         `;
@@ -1391,6 +1395,55 @@
         `;
         chartsContainer.appendChild(chartCard);
       });
+    }
+
+    async function deleteChild(childId) {
+      const child = appData.children.find(c => c.id === childId);
+      if (!child) return;
+      
+      if (!confirm(`⚠️ Tem certeza que deseja excluir o perfil de ${child.name}?\n\nEsta ação não pode ser desfeita e todos os dados e histórico serão perdidos.`)) {
+        return;
+      }
+      
+      appData.children = appData.children.filter(c => c.id !== childId);
+      await saveData();
+      renderDashboard();
+      alert(`✅ Perfil de ${child.name} foi excluído com sucesso!`);
+    }
+
+    async function syncMissionsWithTemplates() {
+      if (!confirm('🔄 Atualizar missões de todos os perfis?\n\nIsso irá sincronizar os nomes, descrições e ações das missões com os templates mais recentes.\n\nO progresso e histórico serão mantidos.')) {
+        return;
+      }
+      
+      let updatedCount = 0;
+      
+      appData.children.forEach(child => {
+        child.missions.forEach(mission => {
+          const template = defaultActivities.find(a => a.id === mission.id);
+          if (template) {
+            // Atualizar apenas se houver diferença
+            if (mission.name !== template.name || 
+                mission.description !== template.description || 
+                mission.action !== template.action) {
+              mission.name = template.name;
+              mission.description = template.description;
+              mission.action = template.action;
+              mission.effects = template.effects;
+              mission.qualityOptions = template.qualityOptions;
+              updatedCount++;
+            }
+          }
+        });
+      });
+      
+      if (updatedCount > 0) {
+        await saveData();
+        alert(`✅ ${updatedCount} missões foram atualizadas com sucesso!\n\nRecarregue a página para ver as mudanças.`);
+        location.reload();
+      } else {
+        alert('✅ Todas as missões já estão atualizadas!');
+      }
     }
 
     async function resetAllMissions() {

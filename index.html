@@ -623,6 +623,7 @@
 
     <div class="missions-section" style="margin-top: 20px;">
       <h2 class="section-title">⚙️ Ações</h2>
+      <button class="btn btn-primary" onclick="showMissionEditor()" style="margin-bottom: 12px;">✏️ Editar Missões</button>
       <button class="btn btn-primary" onclick="resetAllMissions()" style="margin-bottom: 12px;">🔄 Resetar Todas as Missões (Novo Dia)</button>
       <button class="btn btn-secondary" onclick="exportData()">💾 Exportar Dados</button>
     </div>
@@ -662,81 +663,147 @@
     // Atividades padrão
     const defaultActivities = [
       {
-        id: 'nao_dar_birra',
-        name: '😊 Não Dar Birra',
-        description: 'Manter a calma e não fazer birra',
-        action: 'Conversar e expressar sentimentos sem gritar ou chorar',
-        effects: { comportamento: 25, bemEstar: 10 }
+        id: 'manter_calma',
+        name: '😊 Manter a Calma',
+        description: 'Controlar as emoções e ser paciente',
+        action: 'Conversar e expressar sentimentos com calma',
+        type: 'comportamento',
+        effects: { comportamento: 25, bemEstar: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiquei calmo o dia todo' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiquei nervoso mas me acalmei' },
+          { value: 0, label: '❌ Não Consegui', description: 'Tive dificuldade em me controlar' }
+        ]
       },
       {
         id: 'preparar_uniforme',
         name: '👕 Preparar Uniforme',
         description: 'Separar o uniforme da escola',
         action: 'Escolher e deixar pronto o uniforme para o dia seguinte',
-        effects: { estudos: 15, comportamento: 10 }
+        type: 'responsabilidade',
+        effects: { estudos: 15, comportamento: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiz tudo direitinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz rápido ou esqueci algo' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ]
       },
       {
         id: 'arrumar_mochila',
         name: '🎒 Arrumar Mochila',
         description: 'Organizar a mochila da escola',
         action: 'Colocar livros, cadernos e materiais na mochila',
-        effects: { estudos: 20, comportamento: 10 }
+        type: 'responsabilidade',
+        effects: { estudos: 20, comportamento: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiz tudo direitinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz rápido ou esqueci algo' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ]
       },
       {
         id: 'tirar_lancheira',
         name: '🍱 Tirar Lancheira',
         description: 'Retirar a lancheira da mochila',
         action: 'Tirar a lancheira e deixar na cozinha para lavar',
-        effects: { estudos: 10, higiene: 10 }
+        type: 'responsabilidade',
+        effects: { estudos: 10, higiene: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiz tudo direitinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz rápido ou esqueci algo' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ]
       },
       {
         id: 'momento_gratidao',
         name: '🙏 Momento de Gratidão',
         description: 'Reconhecer e agradecer um momento bom',
         action: 'Pensar e compartilhar algo bom que aconteceu hoje',
-        effects: { comportamento: 20, bemEstar: 20 }
+        type: 'reflexao',
+        effects: { comportamento: 20, bemEstar: 20 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Pensei e compartilhei com carinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Pensei mas não compartilhei' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ]
       },
       {
         id: 'alimentar_direito',
         name: '🍽️ Alimentar Direito',
         description: 'Fazer as refeições sem enrolação',
         action: 'Comer café, almoço e jantar com atenção e sem distrações',
-        effects: { bemEstar: 30, comportamento: 10 }
+        type: 'habito',
+        effects: { bemEstar: 30, comportamento: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Comi todas as refeições com atenção' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Comi mas me distraí ou enrolei' },
+          { value: 0, label: '❌ Não Fiz', description: 'Pulei refeições ou não comi direito' }
+        ]
       },
       {
         id: 'beber_liquido',
         name: '💧 Beber Líquido',
         description: 'Beber água e sucos durante o dia',
         action: 'Tomar água, suco ou leite ao longo do dia',
-        effects: { bemEstar: 20 }
+        type: 'habito',
+        effects: { bemEstar: 20 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Bebi bastante líquido' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Bebi pouco' },
+          { value: 0, label: '❌ Não Fiz', description: 'Esqueci de beber' }
+        ]
       },
       {
         id: 'ler_livro',
         name: '📚 Ler um Livro',
         description: 'Ler um livro ou história',
         action: 'Ler sozinho ou com os pais',
-        effects: { estudos: 25, bemEstar: 15 }
+        type: 'habito',
+        effects: { estudos: 25, bemEstar: 15 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Li com atenção e aproveitei' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Li mas me distraí' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não li hoje' }
+        ]
       },
       {
         id: 'deitar_horario',
         name: '😴 Deitar no Horário',
         description: 'Ir para cama no horário (dias de semana)',
         action: 'Estar pronto para dormir no horário combinado',
-        effects: { bemEstar: 25, comportamento: 15 }
+        type: 'habito',
+        effects: { bemEstar: 25, comportamento: 15 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Deitei no horário certinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Deitei um pouco atrasado' },
+          { value: 0, label: '❌ Não Fiz', description: 'Deitei muito tarde' }
+        ]
       },
       {
         id: 'escovar_dentes',
         name: '🦷 Escovar os Dentes',
         description: 'Escovar os dentes',
         action: 'Escovar bem os dentes após as refeições',
-        effects: { higiene: 30, bemEstar: 10 }
+        type: 'higiene',
+        effects: { higiene: 30, bemEstar: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Escovei bem todas as vezes' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Escovei mas faltou alguma vez' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não escovei hoje' }
+        ]
       },
       {
         id: 'brincar',
         name: '🎨 Brincar',
         description: 'Brincar com brinquedos e jogos',
         action: 'Brincar com brinquedos, jogos ou atividades criativas',
-        effects: { bemEstar: 30, comportamento: 10 }
+        type: 'lazer',
+        effects: { bemEstar: 30, comportamento: 10 },
+        qualityOptions: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Brinquei bastante e me diverti' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Brinquei um pouco' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não brinquei hoje' }
+        ]
       }
     ];
 
@@ -1117,8 +1184,49 @@
     function showQualityModal(missionId) {
       currentMissionId = missionId;
       const mission = appData.currentChild.missions.find(m => m.id === missionId);
-      document.getElementById('modalTitle').textContent = `Como você fez: ${mission.name}?`;
-      document.getElementById('qualityModal').classList.remove('hidden');
+      
+      // Buscar opções de qualidade personalizadas
+      const activityTemplate = defaultActivities.find(a => a.id === mission.id);
+      const qualityOptions = activityTemplate?.qualityOptions || [
+        { value: 100, label: '🌟 Perfeito!', description: 'Fiz tudo direitinho' },
+        { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz rápido ou incompleto' },
+        { value: 0, label: '❌ Não Fiz', description: 'Pulei esta missão' }
+      ];
+      
+      // Criar modal dinâmico
+      const modal = document.getElementById('qualityModal');
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 400px;">
+          <h3 class="modal-title" id="modalTitle">Como você fez: ${mission.name}?</h3>
+          
+          ${qualityOptions.map(option => `
+            <button 
+              class="quality-option" 
+              onclick="completeMission('${missionId}', ${option.value})"
+              style="
+                width: 100%;
+                padding: 16px;
+                margin-bottom: 12px;
+                background: white;
+                border: 2px solid #E5E7EB;
+                border-radius: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: left;
+              "
+              onmouseover="this.style.borderColor='#667eea'; this.style.transform='translateY(-2px)'"
+              onmouseout="this.style.borderColor='#E5E7EB'; this.style.transform='translateY(0)'"
+            >
+              <div style="font-size: 18px; font-weight: 600; margin-bottom: 4px;">${option.label}</div>
+              <div style="font-size: 14px; color: #6B7280;">${option.description}</div>
+            </button>
+          `).join('')}
+          
+          <button class="btn btn-secondary" onclick="closeQualityModal()" style="margin-top: 8px;">❌ Cancelar</button>
+        </div>
+      `;
+      
+      modal.classList.remove('hidden');
     }
 
     function closeQualityModal() {
@@ -1289,6 +1397,369 @@
       await saveData();
       renderDashboard();
       alert('✅ Todas as missões foram resetadas! Bom novo dia!');
+    }
+
+    function showMissionEditor() {
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.id = 'missionEditorModal';
+      
+      const renderEditor = () => {
+        modal.innerHTML = `
+          <div class="modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <h3 class="modal-title">✏️ Editor de Missões</h3>
+            
+            <div style="margin-bottom: 20px;">
+              <button class="btn btn-primary" onclick="showAddMissionForm()" style="width: 100%;">➕ Adicionar Nova Missão</button>
+            </div>
+            
+            <div id="missionsList"></div>
+            
+            <button class="btn btn-secondary" onclick="closeMissionEditor()" style="margin-top: 16px;">❌ Fechar</button>
+          </div>
+        `;
+        
+        const missionsList = modal.querySelector('#missionsList');
+        
+        defaultActivities.forEach((mission, index) => {
+          const missionCard = document.createElement('div');
+          missionCard.style.cssText = 'background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px; margin-bottom: 12px;';
+          missionCard.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+              <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 16px; margin-bottom: 4px;">${mission.name}</div>
+                <div style="font-size: 14px; color: #6B7280; margin-bottom: 4px;">${mission.description}</div>
+                <div style="font-size: 12px; color: #9CA3AF;">📝 ${mission.action}</div>
+                <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">
+                  Tipo: ${mission.type} | Efeitos: ${Object.keys(mission.effects).map(k => `${k} +${mission.effects[k]}`).join(', ')}
+                </div>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <button 
+                  onclick="editMission(${index})" 
+                  style="padding: 8px 12px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;"
+                >✏️ Editar</button>
+                <button 
+                  onclick="deleteMission(${index})" 
+                  style="padding: 8px 12px; background: #EF4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;"
+                >🗑️ Remover</button>
+              </div>
+            </div>
+          `;
+          missionsList.appendChild(missionCard);
+        });
+      };
+      
+      document.body.appendChild(modal);
+      renderEditor();
+    }
+    
+    function closeMissionEditor() {
+      const modal = document.getElementById('missionEditorModal');
+      if (modal) modal.remove();
+    }
+    
+    function showAddMissionForm() {
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.id = 'addMissionModal';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+          <h3 class="modal-title">➕ Adicionar Nova Missão</h3>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Nome da Missão:</label>
+            <input type="text" id="newMissionName" placeholder="Ex: 🐶 Dar Comida para o Cachorro" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Descrição:</label>
+            <input type="text" id="newMissionDescription" placeholder="Ex: Alimentar o cachorro" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Ação:</label>
+            <input type="text" id="newMissionAction" placeholder="Ex: Colocar ração e água fresca" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Tipo:</label>
+            <select id="newMissionType" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+              <option value="comportamento">Comportamento</option>
+              <option value="responsabilidade">Responsabilidade</option>
+              <option value="higiene">Higiene</option>
+              <option value="habito">Hábito</option>
+              <option value="reflexao">Reflexão</option>
+              <option value="lazer">Lazer</option>
+            </select>
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Efeitos:</label>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Comportamento:</label>
+                <input type="number" id="effectComportamento" value="0" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Higiene:</label>
+                <input type="number" id="effectHigiene" value="0" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Estudos:</label>
+                <input type="number" id="effectEstudos" value="0" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Bem-estar:</label>
+                <input type="number" id="effectBemEstar" value="0" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" onclick="saveNewMission()" style="margin-bottom: 12px;">✅ Salvar Missão</button>
+          <button class="btn btn-secondary" onclick="closeAddMissionModal()">❌ Cancelar</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function closeAddMissionModal() {
+      const modal = document.getElementById('addMissionModal');
+      if (modal) modal.remove();
+    }
+    
+    async function saveNewMission() {
+      const name = document.getElementById('newMissionName').value.trim();
+      const description = document.getElementById('newMissionDescription').value.trim();
+      const action = document.getElementById('newMissionAction').value.trim();
+      const type = document.getElementById('newMissionType').value;
+      
+      if (!name || !description || !action) {
+        alert('⚠️ Por favor, preencha todos os campos!');
+        return;
+      }
+      
+      const effects = {
+        comportamento: parseInt(document.getElementById('effectComportamento').value) || 0,
+        higiene: parseInt(document.getElementById('effectHigiene').value) || 0,
+        estudos: parseInt(document.getElementById('effectEstudos').value) || 0,
+        bemEstar: parseInt(document.getElementById('effectBemEstar').value) || 0
+      };
+      
+      // Remover efeitos zerados
+      Object.keys(effects).forEach(key => {
+        if (effects[key] === 0) delete effects[key];
+      });
+      
+      const newMission = {
+        id: `custom_${Date.now()}`,
+        name,
+        description,
+        action,
+        type,
+        effects,
+        qualityOptions: getDefaultQualityOptions(type)
+      };
+      
+      defaultActivities.push(newMission);
+      
+      // Adicionar missão a todas as crianças
+      appData.children.forEach(child => {
+        child.missions.push({
+          id: newMission.id,
+          name: newMission.name,
+          description: newMission.description,
+          action: newMission.action,
+          effects: newMission.effects,
+          completed: false,
+          quality: 0
+        });
+      });
+      
+      await saveData();
+      closeAddMissionModal();
+      closeMissionEditor();
+      showMissionEditor();
+      alert('✅ Missão adicionada com sucesso!');
+    }
+    
+    function getDefaultQualityOptions(type) {
+      const options = {
+        comportamento: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiquei calmo o dia todo' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiquei nervoso mas me acalmei' },
+          { value: 0, label: '❌ Não Consegui', description: 'Tive dificuldade em me controlar' }
+        ],
+        responsabilidade: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiz tudo direitinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz rápido ou esqueci algo' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ],
+        higiene: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiz tudo com capricho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz mas faltou algo' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ],
+        habito: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Fiz com atenção' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Fiz mas me distraí' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ],
+        reflexao: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Pensei e compartilhei com carinho' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Pensei mas não compartilhei' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não fiz hoje' }
+        ],
+        lazer: [
+          { value: 100, label: '🌟 Perfeito!', description: 'Me diverti bastante' },
+          { value: 50, label: '⚠️ Mais ou Menos', description: 'Brinquei um pouco' },
+          { value: 0, label: '❌ Não Fiz', description: 'Não brinquei hoje' }
+        ]
+      };
+      return options[type] || options.habito;
+    }
+    
+    function editMission(index) {
+      const mission = defaultActivities[index];
+      
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.id = 'editMissionModal';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 500px;">
+          <h3 class="modal-title">✏️ Editar Missão</h3>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Nome da Missão:</label>
+            <input type="text" id="editMissionName" value="${mission.name}" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Descrição:</label>
+            <input type="text" id="editMissionDescription" value="${mission.description}" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Ação:</label>
+            <input type="text" id="editMissionAction" value="${mission.action}" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Tipo:</label>
+            <select id="editMissionType" style="width: 100%; padding: 12px; border: 1px solid #E5E7EB; border-radius: 8px;">
+              <option value="comportamento" ${mission.type === 'comportamento' ? 'selected' : ''}>Comportamento</option>
+              <option value="responsabilidade" ${mission.type === 'responsabilidade' ? 'selected' : ''}>Responsabilidade</option>
+              <option value="higiene" ${mission.type === 'higiene' ? 'selected' : ''}>Higiene</option>
+              <option value="habito" ${mission.type === 'habito' ? 'selected' : ''}>Hábito</option>
+              <option value="reflexao" ${mission.type === 'reflexao' ? 'selected' : ''}>Reflexão</option>
+              <option value="lazer" ${mission.type === 'lazer' ? 'selected' : ''}>Lazer</option>
+            </select>
+          </div>
+          
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 8px;">Efeitos:</label>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Comportamento:</label>
+                <input type="number" id="editEffectComportamento" value="${mission.effects.comportamento || 0}" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Higiene:</label>
+                <input type="number" id="editEffectHigiene" value="${mission.effects.higiene || 0}" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Estudos:</label>
+                <input type="number" id="editEffectEstudos" value="${mission.effects.estudos || 0}" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+              <div>
+                <label style="font-size: 12px; color: #6B7280;">Bem-estar:</label>
+                <input type="number" id="editEffectBemEstar" value="${mission.effects.bemEstar || 0}" min="0" max="50" style="width: 100%; padding: 8px; border: 1px solid #E5E7EB; border-radius: 6px;">
+              </div>
+            </div>
+          </div>
+          
+          <button class="btn btn-primary" onclick="saveEditedMission(${index})" style="margin-bottom: 12px;">✅ Salvar Alterações</button>
+          <button class="btn btn-secondary" onclick="closeEditMissionModal()">❌ Cancelar</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    
+    function closeEditMissionModal() {
+      const modal = document.getElementById('editMissionModal');
+      if (modal) modal.remove();
+    }
+    
+    async function saveEditedMission(index) {
+      const mission = defaultActivities[index];
+      const oldId = mission.id;
+      
+      mission.name = document.getElementById('editMissionName').value.trim();
+      mission.description = document.getElementById('editMissionDescription').value.trim();
+      mission.action = document.getElementById('editMissionAction').value.trim();
+      mission.type = document.getElementById('editMissionType').value;
+      
+      if (!mission.name || !mission.description || !mission.action) {
+        alert('⚠️ Por favor, preencha todos os campos!');
+        return;
+      }
+      
+      mission.effects = {
+        comportamento: parseInt(document.getElementById('editEffectComportamento').value) || 0,
+        higiene: parseInt(document.getElementById('editEffectHigiene').value) || 0,
+        estudos: parseInt(document.getElementById('editEffectEstudos').value) || 0,
+        bemEstar: parseInt(document.getElementById('editEffectBemEstar').value) || 0
+      };
+      
+      // Remover efeitos zerados
+      Object.keys(mission.effects).forEach(key => {
+        if (mission.effects[key] === 0) delete mission.effects[key];
+      });
+      
+      mission.qualityOptions = getDefaultQualityOptions(mission.type);
+      
+      // Atualizar missão em todas as crianças
+      appData.children.forEach(child => {
+        const childMission = child.missions.find(m => m.id === oldId);
+        if (childMission) {
+          childMission.name = mission.name;
+          childMission.description = mission.description;
+          childMission.action = mission.action;
+          childMission.effects = mission.effects;
+        }
+      });
+      
+      await saveData();
+      closeEditMissionModal();
+      closeMissionEditor();
+      showMissionEditor();
+      alert('✅ Missão atualizada com sucesso!');
+    }
+    
+    async function deleteMission(index) {
+      const mission = defaultActivities[index];
+      
+      if (!confirm(`⚠️ Tem certeza que deseja remover a missão "${mission.name}"?\n\nEla será removida de todas as crianças.`)) {
+        return;
+      }
+      
+      const missionId = mission.id;
+      
+      // Remover do array de atividades padrão
+      defaultActivities.splice(index, 1);
+      
+      // Remover de todas as crianças
+      appData.children.forEach(child => {
+        child.missions = child.missions.filter(m => m.id !== missionId);
+      });
+      
+      await saveData();
+      closeMissionEditor();
+      showMissionEditor();
+      alert('✅ Missão removida com sucesso!');
     }
 
     function exportData() {

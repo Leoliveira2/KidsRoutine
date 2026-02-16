@@ -740,6 +740,120 @@
       }
     ];
 
+    // Funções de Histórico e Reset Automático
+    function getTodayDate() {
+      const now = new Date();
+      return now.toISOString().split('T')[0]; // Formato: YYYY-MM-DD
+    }
+
+    function checkAndResetNewDay() {
+      const today = getTodayDate();
+      
+      // Verificar se já existe lastDate no appData
+      if (!appData.lastDate) {
+        appData.lastDate = today;
+        saveData();
+        return;
+      }
+      
+      // Se mudou o dia, salvar histórico e resetar
+      if (appData.lastDate !== today) {
+        saveHistoryAndReset(appData.lastDate);
+        appData.lastDate = today;
+      }
+    }
+
+    async function saveHistoryAndReset(date) {
+      // Inicializar histórico se não existir
+      if (!appData.history) {
+        appData.history = {};
+      }
+      
+      // Salvar estado de cada criança no histórico
+      appData.children.forEach(child => {
+        if (!appData.history[child.id]) {
+          appData.history[child.id] = {};
+        }
+        
+        const completedCount = child.missions.filter(m => m.completed).length;
+        const totalCount = child.missions.length;
+        const percentage = Math.round((completedCount / totalCount) * 100);
+        
+        // Calcular média dos status
+        const avgStatus = Math.round(
+          (child.status.comportamento + child.status.higiene + 
+           child.status.estudos + child.status.bemEstar) / 4
+        );
+        
+        appData.history[child.id][date] = {
+          missions: child.missions.map(m => ({
+            id: m.id,
+            name: m.name,
+            completed: m.completed,
+            quality: m.quality
+          })),
+          status: { ...child.status },
+          completedCount: completedCount,
+          totalCount: totalCount,
+          percentage: percentage,
+          avgStatus: avgStatus
+        };
+        
+        // Resetar missões
+        child.missions.forEach(mission => {
+          mission.completed = false;
+          mission.quality = null;
+        });
+        
+        // Resetar status para 100%
+        child.status = {
+          comportamento: 100,
+          higiene: 100,
+          estudos: 100,
+          bemEstar: 100
+        };
+      });
+      
+      await saveData();
+    }
+
+    function getHistoryForChild(childId, days = 7) {
+      if (!appData.history || !appData.history[childId]) {
+        return [];
+      }
+      
+      const history = appData.history[childId];
+      const dates = Object.keys(history).sort().reverse().slice(0, days);
+      
+      return dates.map(date => ({
+        date: date,
+        ...history[date]
+      }));
+    }
+
+    function getWeeklyStats(childId) {
+      const history = getHistoryForChild(childId, 7);
+      
+      if (history.length === 0) {
+        return null;
+      }
+      
+      const avgPercentage = Math.round(
+        history.reduce((sum, day) => sum + day.percentage, 0) / history.length
+      );
+      
+      const avgStatus = Math.round(
+        history.reduce((sum, day) => sum + day.avgStatus, 0) / history.length
+      );
+      
+      return {
+        avgPercentage,
+        avgStatus,
+        daysTracked: history.length,
+        history: history.reverse() // Ordem cronológica
+      };
+    }
+
     // Função de migração de dados antigos
     function migrateOldData() {
       if (!appData.children) return;
@@ -942,6 +1056,10 @@
 
     function selectChild(childId) {
       appData.currentChild = appData.children.find(c => c.id === childId);
+      
+      // Verificar se é um novo dia e resetar se necessário
+      checkAndResetNewDay();
+      
       document.getElementById('profileScreen').classList.add('hidden');
       document.getElementById('childScreen').classList.remove('hidden');
       renderChildScreen();
@@ -1072,9 +1190,18 @@
         const completedCount = child.missions.filter(m => m.completed).length;
         const totalCount = child.missions.length;
         const percentage = Math.round((completedCount / totalCount) * 100);
+        
+        // Obter estatísticas semanais
+        const weeklyStats = getWeeklyStats(child.id);
+        const weeklyInfo = weeklyStats ? 
+          `<div style="font-size: 12px; color: #6B7280; margin-top: 8px;">
+            📈 Média Semanal: ${weeklyStats.avgPercentage}% | ${weeklyStats.daysTracked} dias registrados
+          </div>` : '';
 
         const card = document.createElement('div');
         card.className = 'mission-card';
+        card.style.cursor = 'pointer';
+        card.onclick = () => showChildTimeline(child.id);
         card.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="display: flex; align-items: center; gap: 16px;">
@@ -1095,12 +1222,14 @@
                     😊 ${child.status.bemEstar}% Bem-estar
                   </span>
                 </div>
+                ${weeklyInfo}
               </div>
             </div>
             <div style="text-align: center;">
               <div style="font-size: 32px; font-weight: 700; color: #667eea;">${completedCount}/${totalCount}</div>
-              <div style="font-size: 14px; color: #6B7280;">Missões</div>
+              <div style="font-size: 14px; color: #6B7280;">Missões Hoje</div>
               <div style="font-size: 12px; color: #10B981; font-weight: 600; margin-top: 4px;">${percentage}%</div>
+              <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">👁️ Clique para ver histórico</div>
             </div>
           </div>
         `;
@@ -1172,6 +1301,164 @@
       link.click();
       URL.revokeObjectURL(url);
       alert('✅ Dados exportados com sucesso!');
+    }
+
+    function showChildTimeline(childId) {
+      const child = appData.children.find(c => c.id === childId);
+      if (!child) return;
+      
+      const history = getHistoryForChild(childId, 30); // Últimos 30 dias
+      
+      if (history.length === 0) {
+        alert('ℹ️ Ainda não há histórico para ${child.name}.\n\nO histórico começa a ser registrado a partir do segundo dia de uso.');
+        return;
+      }
+      
+      // Criar modal de timeline
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+          <h3 class="modal-title">${child.avatar} Histórico de ${child.name}</h3>
+          
+          <div style="margin-bottom: 24px;">
+            <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">📈 Últimos 7 Dias</h4>
+            <div id="weeklyChart"></div>
+          </div>
+          
+          <div style="margin-bottom: 24px;">
+            <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">📅 Histórico Completo</h4>
+            <div id="historyList"></div>
+          </div>
+          
+          <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">❌ Fechar</button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      // Renderizar gráfico semanal (simplificado com barras)
+      const weeklyChart = modal.querySelector('#weeklyChart');
+      const last7Days = history.slice(0, 7).reverse();
+      
+      last7Days.forEach(day => {
+        const date = new Date(day.date);
+        const dayName = date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+        
+        const dayCard = document.createElement('div');
+        dayCard.style.cssText = 'background: #F9FAFB; border-radius: 8px; padding: 12px; margin-bottom: 8px;';
+        dayCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div style="font-weight: 600; font-size: 14px;">${dayName}</div>
+            <div style="font-weight: 700; font-size: 18px; color: ${day.percentage >= 80 ? '#10B981' : day.percentage >= 50 ? '#F59E0B' : '#EF4444'};">
+              ${day.percentage}%
+            </div>
+          </div>
+          <div style="height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden;">
+            <div style="height: 100%; width: ${day.percentage}%; background: ${day.percentage >= 80 ? '#10B981' : day.percentage >= 50 ? '#F59E0B' : '#EF4444'};"></div>
+          </div>
+          <div style="font-size: 11px; color: #6B7280; margin-top: 4px;">
+            ${day.completedCount}/${day.totalCount} missões completadas
+          </div>
+        `;
+        weeklyChart.appendChild(dayCard);
+      });
+      
+      // Renderizar lista de histórico
+      const historyList = modal.querySelector('#historyList');
+      
+      history.forEach(day => {
+        const date = new Date(day.date);
+        const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        
+        const dayCard = document.createElement('div');
+        dayCard.style.cssText = 'background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px; margin-bottom: 8px; cursor: pointer;';
+        dayCard.onclick = () => showDayDetails(child, day);
+        dayCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">${dateStr}</div>
+              <div style="font-size: 12px; color: #6B7280;">${day.completedCount}/${day.totalCount} missões</div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-weight: 700; font-size: 20px; color: ${day.percentage >= 80 ? '#10B981' : day.percentage >= 50 ? '#F59E0B' : '#EF4444'};">
+                ${day.percentage}%
+              </div>
+              <div style="font-size: 11px; color: #6B7280;">👁️ Ver detalhes</div>
+            </div>
+          </div>
+        `;
+        historyList.appendChild(dayCard);
+      });
+    }
+    
+    function showDayDetails(child, day) {
+      const date = new Date(day.date);
+      const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+          <h3 class="modal-title">${child.avatar} ${child.name} - ${dateStr}</h3>
+          
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+            <div style="background: #D1FAE5; padding: 12px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #065F46;">Comportamento</div>
+              <div style="font-size: 24px; font-weight: 700; color: #065F46;">${day.status.comportamento}%</div>
+            </div>
+            <div style="background: #DBEAFE; padding: 12px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #1E40AF;">Higiene</div>
+              <div style="font-size: 24px; font-weight: 700; color: #1E40AF;">${day.status.higiene}%</div>
+            </div>
+            <div style="background: #EDE9FE; padding: 12px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #5B21B6;">Estudos</div>
+              <div style="font-size: 24px; font-weight: 700; color: #5B21B6;">${day.status.estudos}%</div>
+            </div>
+            <div style="background: #FEF3C7; padding: 12px; border-radius: 8px;">
+              <div style="font-size: 12px; color: #92400E;">Bem-estar</div>
+              <div style="font-size: 24px; font-weight: 700; color: #92400E;">${day.status.bemEstar}%</div>
+            </div>
+          </div>
+          
+          <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 12px;">✅ Missões do Dia</h4>
+          <div id="dayMissions"></div>
+          
+          <button class="btn btn-secondary" onclick="this.closest('.modal').remove()" style="margin-top: 16px;">❌ Fechar</button>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      const missionsContainer = modal.querySelector('#dayMissions');
+      
+      day.missions.forEach(mission => {
+        const missionCard = document.createElement('div');
+        missionCard.style.cssText = `
+          background: ${mission.completed ? '#F0FDF4' : '#FEF2F2'};
+          border: 1px solid ${mission.completed ? '#BBF7D0' : '#FECACA'};
+          border-radius: 8px;
+          padding: 12px;
+          margin-bottom: 8px;
+        `;
+        
+        const qualityText = mission.quality === 100 ? '🌟 Perfeito!' : 
+                           mission.quality === 50 ? '⚠️ Mais ou Menos' : 
+                           mission.quality === 0 ? '❌ Não Fez' : '';
+        
+        missionCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">${mission.name}</div>
+              ${mission.completed ? `<div style="font-size: 12px; color: #15803D; margin-top: 4px;">${qualityText}</div>` : ''}
+            </div>
+            <div style="font-size: 24px;">${mission.completed ? '✅' : '❌'}</div>
+          </div>
+        `;
+        missionsContainer.appendChild(missionCard);
+      });
     }
 
     // Sincronização em tempo real

@@ -689,7 +689,7 @@
     }
 
     async function createNewPin() {
-      const pin = prompt('Digite um novo PIN de 6 dígitos para sua família:\n\n⚠️ IMPORTANTE: Anote este PIN em local seguro!\nVocê precisará dele para acessar o app em outros dispositivos.');
+      const pin = document.getElementById('pinInput').value;
       
       if (!pin || pin.length !== 6 || !/^\d{6}$/.test(pin)) {
         alert('PIN inválido! Deve ter exatamente 6 dígitos numéricos.');
@@ -715,7 +715,9 @@
         };
 
         await docRef.set(appData);
-        alert('PIN criado com sucesso! Agora você pode adicionar crianças.');
+        localStorage.setItem('kidsroutine_pin', pin);
+        alert('✅ PIN criado com sucesso!\n\n🔑 Seu PIN: ' + pin + '\n\n⚠️ IMPORTANTE: Anote este PIN em local seguro!\nVocê precisará dele para acessar o app em outros dispositivos.');
+        setupRealtimeSync();
         showProfileScreen();
       } catch (error) {
         console.error('Erro ao criar PIN:', error);

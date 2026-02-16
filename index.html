@@ -956,6 +956,24 @@
           }));
           needsSave = true;
         }
+        
+        // Sincronizar nomes, descrições e ações das missões com os templates atualizados
+        if (child.missions) {
+          child.missions.forEach(mission => {
+            const template = defaultActivities.find(a => a.id === mission.id);
+            if (template) {
+              if (mission.name !== template.name || 
+                  mission.description !== template.description || 
+                  mission.action !== template.action) {
+                mission.name = template.name;
+                mission.description = template.description;
+                mission.action = template.action;
+                mission.effects = template.effects;
+                needsSave = true;
+              }
+            }
+          });
+        }
       });
       
       // Salvar se houve mudanças

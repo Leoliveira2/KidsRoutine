@@ -740,6 +740,49 @@
       }
     ];
 
+    // Função de migração de dados antigos
+    function migrateOldData() {
+      if (!appData.children) return;
+      
+      let needsSave = false;
+      
+      appData.children.forEach(child => {
+        // Verificar se tem estrutura antiga de status
+        if (child.status) {
+          const hasOldStructure = child.status.hasOwnProperty('energia') || 
+                                   child.status.hasOwnProperty('saudeBucal') || 
+                                   child.status.hasOwnProperty('felicidade');
+          
+          if (hasOldStructure) {
+            // Migrar para nova estrutura
+            const oldHigiene = child.status.higiene || 100;
+            child.status = {
+              comportamento: 100,
+              higiene: oldHigiene,
+              estudos: 100,
+              bemEstar: 100
+            };
+            needsSave = true;
+          }
+        }
+        
+        // Atualizar missões para nova estrutura se necessário
+        if (child.missions && child.missions.length !== defaultActivities.length) {
+          child.missions = defaultActivities.map(act => ({
+            ...act,
+            completed: false,
+            quality: null
+          }));
+          needsSave = true;
+        }
+      });
+      
+      // Salvar se houve mudanças
+      if (needsSave) {
+        saveData();
+      }
+    }
+
     // Funções de PIN
     async function handlePinSubmit() {
       const pin = document.getElementById('pinInput').value;
@@ -760,6 +803,10 @@
 
         appData = doc.data();
         appData.pin = pin;
+        
+        // Migrar dados antigos para nova estrutura
+        migrateOldData();
+        
         localStorage.setItem('kidsroutine_pin', pin);
         setupRealtimeSync();
         showProfileScreen();

@@ -521,27 +521,27 @@
 
       <div class="status-grid">
         <div class="status-item">
-          <div class="status-label">⚡ Energia</div>
+          <div class="status-label">🎯 Comportamento</div>
           <div class="progress-bar">
-            <div class="progress-fill" id="energiaBar" style="width: 100%; background: #10B981;"></div>
+            <div class="progress-fill" id="comportamentoBar" style="width: 100%; background: #10B981;"></div>
           </div>
         </div>
         <div class="status-item">
-          <div class="status-label">🛁 Higiene</div>
+          <div class="status-label">🧴 Higiene</div>
           <div class="progress-bar">
             <div class="progress-fill" id="higieneBar" style="width: 100%; background: #3B82F6;"></div>
           </div>
         </div>
         <div class="status-item">
-          <div class="status-label">🦷 Saúde Bucal</div>
+          <div class="status-label">📚 Estudos</div>
           <div class="progress-bar">
-            <div class="progress-fill" id="saudeBucalBar" style="width: 100%; background: #8B5CF6;"></div>
+            <div class="progress-fill" id="estudosBar" style="width: 100%; background: #8B5CF6;"></div>
           </div>
         </div>
         <div class="status-item">
-          <div class="status-label">😊 Felicidade</div>
+          <div class="status-label">😊 Bem-estar</div>
           <div class="progress-bar">
-            <div class="progress-fill" id="felicidadeBar" style="width: 100%; background: #F59E0B;"></div>
+            <div class="progress-fill" id="bemEstarBar" style="width: 100%; background: #F59E0B;"></div>
           </div>
         </div>
       </div>
@@ -595,6 +595,39 @@
     </div>
   </div>
 
+  <!-- Painel dos Pais -->
+  <div id="parentDashboard" class="child-screen hidden">
+    <div class="header">
+      <div class="header-top">
+        <div class="child-info">
+          <div class="child-avatar">👨‍👩‍👧‍👦</div>
+          <div>
+            <div class="child-name">Painel dos Pais</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" onclick="closeDashboard()">🔙 Voltar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="missions-section">
+      <h2 class="section-title">👶 Crianças</h2>
+      <div id="dashboardChildrenContainer"></div>
+    </div>
+
+    <div class="missions-section" style="margin-top: 20px;">
+      <h2 class="section-title">📊 Progresso Geral</h2>
+      <div id="dashboardChartsContainer"></div>
+    </div>
+
+    <div class="missions-section" style="margin-top: 20px;">
+      <h2 class="section-title">⚙️ Ações</h2>
+      <button class="btn btn-primary" onclick="resetAllMissions()" style="margin-bottom: 12px;">🔄 Resetar Todas as Missões (Novo Dia)</button>
+      <button class="btn btn-secondary" onclick="exportData()">💾 Exportar Dados</button>
+    </div>
+  </div>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -629,130 +662,81 @@
     // Atividades padrão
     const defaultActivities = [
       {
-        id: 'cafe',
-        name: '☕ Café da Manhã',
-        description: 'Tomar café da manhã completo',
-        action: 'Comer frutas, pão/cereal e tomar leite/suco',
-        effects: { energia: 20, felicidade: 10 }
+        id: 'nao_dar_birra',
+        name: '😊 Não Dar Birra',
+        description: 'Manter a calma e não fazer birra',
+        action: 'Conversar e expressar sentimentos sem gritar ou chorar',
+        effects: { comportamento: 25, bemEstar: 10 }
       },
       {
-        id: 'almoco',
-        name: '🍽️ Almoço',
-        description: 'Almoçar bem',
-        action: 'Comer arroz, feijão, carne/frango e salada',
-        effects: { energia: 25, felicidade: 10 }
+        id: 'preparar_uniforme',
+        name: '👕 Preparar Uniforme',
+        description: 'Separar o uniforme da escola',
+        action: 'Escolher e deixar pronto o uniforme para o dia seguinte',
+        effects: { estudos: 15, comportamento: 10 }
       },
       {
-        id: 'jantar',
-        name: '🌙 Jantar',
-        description: 'Jantar saudável',
-        action: 'Fazer uma refeição leve e saudável',
-        effects: { energia: 15, felicidade: 10 }
+        id: 'arrumar_mochila',
+        name: '🎒 Arrumar Mochila',
+        description: 'Organizar a mochila da escola',
+        action: 'Colocar livros, cadernos e materiais na mochila',
+        effects: { estudos: 20, comportamento: 10 }
       },
       {
-        id: 'banho_manha',
-        name: '🚿 Banho da Manhã',
-        description: 'Tomar banho ao acordar',
-        action: 'Lavar o corpo todo com sabonete e shampoo',
-        effects: { higiene: 30, felicidade: 5 }
+        id: 'tirar_lancheira',
+        name: '🍱 Tirar Lancheira',
+        description: 'Retirar a lancheira da mochila',
+        action: 'Tirar a lancheira e deixar na cozinha para lavar',
+        effects: { estudos: 10, higiene: 10 }
       },
       {
-        id: 'banho_noite',
-        name: '🛁 Banho da Noite',
-        description: 'Tomar banho antes de dormir',
-        action: 'Lavar bem o corpo e o cabelo',
-        effects: { higiene: 30, felicidade: 5 }
+        id: 'momento_gratidao',
+        name: '🙏 Momento de Gratidão',
+        description: 'Reconhecer e agradecer um momento bom',
+        action: 'Pensar e compartilhar algo bom que aconteceu hoje',
+        effects: { comportamento: 20, bemEstar: 20 }
       },
       {
-        id: 'escovar_manha',
-        name: '🪥 Escovar Dentes (Manhã)',
-        description: 'Escovar os dentes após café',
-        action: 'Escovar os dentes por 2 minutos',
-        effects: { saudeBucal: 20, higiene: 10 }
+        id: 'alimentar_direito',
+        name: '🍽️ Alimentar Direito',
+        description: 'Fazer as refeições sem enrolação',
+        action: 'Comer café, almoço e jantar com atenção e sem distrações',
+        effects: { bemEstar: 30, comportamento: 10 }
       },
       {
-        id: 'escovar_almoco',
-        name: '🦷 Escovar Dentes (Almoço)',
-        description: 'Escovar os dentes após almoço',
-        action: 'Escovar os dentes por 2 minutos',
-        effects: { saudeBucal: 20, higiene: 10 }
-      },
-      {
-        id: 'escovar_noite',
-        name: '✨ Escovar Dentes (Noite)',
-        description: 'Escovar os dentes antes de dormir',
-        action: 'Escovar os dentes por 2 minutos e usar fio dental',
-        effects: { saudeBucal: 25, higiene: 10 }
-      },
-      {
-        id: 'dormir_cedo',
-        name: '😴 Dormir Cedo',
-        description: 'Ir para cama no horário',
-        action: 'Estar na cama às 21h',
-        effects: { energia: 30, felicidade: 10 }
-      },
-      {
-        id: 'arrumar_cama',
-        name: '🛏️ Arrumar a Cama',
-        description: 'Arrumar a cama ao acordar',
-        action: 'Esticar o lençol e organizar o travesseiro',
-        effects: { felicidade: 15 }
-      },
-      {
-        id: 'organizar_brinquedos',
-        name: '🧸 Organizar Brinquedos',
-        description: 'Guardar os brinquedos',
-        action: 'Colocar todos os brinquedos no lugar',
-        effects: { felicidade: 15 }
-      },
-      {
-        id: 'licao_casa',
-        name: '📝 Lição de Casa',
-        description: 'Fazer toda a lição',
-        action: 'Completar todas as tarefas da escola',
-        effects: { felicidade: 20 }
+        id: 'beber_liquido',
+        name: '💧 Beber Líquido',
+        description: 'Beber água e sucos durante o dia',
+        action: 'Tomar água, suco ou leite ao longo do dia',
+        effects: { bemEstar: 20 }
       },
       {
         id: 'ler_livro',
         name: '📚 Ler um Livro',
-        description: 'Ler por 20 minutos',
-        action: 'Ler pelo menos 10 páginas de um livro',
-        effects: { felicidade: 15 }
+        description: 'Ler um livro ou história',
+        action: 'Ler sozinho ou com os pais',
+        effects: { estudos: 25, bemEstar: 15 }
       },
       {
-        id: 'ajudar_casa',
-        name: '🏠 Ajudar em Casa',
-        description: 'Ajudar nas tarefas domésticas',
-        action: 'Ajudar a arrumar a mesa ou guardar louça',
-        effects: { felicidade: 20 }
+        id: 'deitar_horario',
+        name: '😴 Deitar no Horário',
+        description: 'Ir para cama no horário (dias de semana)',
+        action: 'Estar pronto para dormir no horário combinado',
+        effects: { bemEstar: 25, comportamento: 15 }
       },
       {
-        id: 'beber_agua',
-        name: '💧 Beber Água',
-        description: 'Beber bastante água',
-        action: 'Beber pelo menos 4 copos de água',
-        effects: { energia: 10, felicidade: 5 }
+        id: 'escovar_dentes',
+        name: '🦷 Escovar os Dentes',
+        description: 'Escovar os dentes',
+        action: 'Escovar bem os dentes após as refeições',
+        effects: { higiene: 30, bemEstar: 10 }
       },
       {
-        id: 'exercicio',
-        name: '⚽ Exercício Físico',
-        description: 'Fazer atividade física',
-        action: 'Brincar, correr ou fazer esporte por 30 minutos',
-        effects: { energia: 15, felicidade: 20 }
-      },
-      {
-        id: 'respeitar_pais',
-        name: '❤️ Respeitar os Pais',
-        description: 'Ser educado e respeitoso',
-        action: 'Obedecer e falar com educação',
-        effects: { felicidade: 25 }
-      },
-      {
-        id: 'ser_gentil',
-        name: '🤝 Ser Gentil',
-        description: 'Ser gentil com todos',
-        action: 'Ajudar e ser amigável com irmãos e amigos',
-        effects: { felicidade: 20 }
+        id: 'brincar',
+        name: '🎨 Brincar',
+        description: 'Brincar com brinquedos e jogos',
+        action: 'Brincar com brinquedos, jogos ou atividades criativas',
+        effects: { bemEstar: 30, comportamento: 10 }
       }
     ];
 
@@ -890,10 +874,10 @@
         name: name,
         avatar: selectedAvatar,
         status: {
-          energia: 100,
+          comportamento: 100,
           higiene: 100,
-          saudeBucal: 100,
-          felicidade: 100
+          estudos: 100,
+          bemEstar: 100
         },
         missions: defaultActivities.map(act => ({
           ...act,
@@ -924,10 +908,10 @@
       document.getElementById('childName').textContent = child.name;
 
       // Atualizar barras de status
-      document.getElementById('energiaBar').style.width = child.status.energia + '%';
+      document.getElementById('comportamentoBar').style.width = child.status.comportamento + '%';
       document.getElementById('higieneBar').style.width = child.status.higiene + '%';
-      document.getElementById('saudeBucalBar').style.width = child.status.saudeBucal + '%';
-      document.getElementById('felicidadeBar').style.width = child.status.felicidade + '%';
+      document.getElementById('estudosBar').style.width = child.status.estudos + '%';
+      document.getElementById('bemEstarBar').style.width = child.status.bemEstar + '%';
 
       // Renderizar missões
       const container = document.getElementById('missionsContainer');
@@ -1016,7 +1000,131 @@
     }
 
     function showParentDashboard() {
-      alert('Dashboard dos Pais em desenvolvimento!');
+      document.getElementById('profileScreen').classList.add('hidden');
+      document.getElementById('parentDashboard').classList.remove('hidden');
+      renderDashboard();
+    }
+
+    function closeDashboard() {
+      document.getElementById('parentDashboard').classList.add('hidden');
+      document.getElementById('profileScreen').classList.remove('hidden');
+    }
+
+    function renderDashboard() {
+      // Renderizar lista de crianças
+      const childrenContainer = document.getElementById('dashboardChildrenContainer');
+      childrenContainer.innerHTML = '';
+
+      if (appData.children.length === 0) {
+        childrenContainer.innerHTML = '<p style="text-align: center; color: #6B7280; padding: 20px;">Nenhuma criança cadastrada ainda.</p>';
+        document.getElementById('dashboardChartsContainer').innerHTML = '';
+        return;
+      }
+
+      appData.children.forEach(child => {
+        const completedCount = child.missions.filter(m => m.completed).length;
+        const totalCount = child.missions.length;
+        const percentage = Math.round((completedCount / totalCount) * 100);
+
+        const card = document.createElement('div');
+        card.className = 'mission-card';
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 16px;">
+              <div style="font-size: 48px;">${child.avatar}</div>
+              <div>
+                <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${child.name}</div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <span style="background: #D1FAE5; color: #065F46; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                    🎯 ${child.status.comportamento}% Comportamento
+                  </span>
+                  <span style="background: #DBEAFE; color: #1E40AF; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                    🧴 ${child.status.higiene}% Higiene
+                  </span>
+                  <span style="background: #EDE9FE; color: #5B21B6; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                    📚 ${child.status.estudos}% Estudos
+                  </span>
+                  <span style="background: #FEF3C7; color: #92400E; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+                    😊 ${child.status.bemEstar}% Bem-estar
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div style="text-align: center;">
+              <div style="font-size: 32px; font-weight: 700; color: #667eea;">${completedCount}/${totalCount}</div>
+              <div style="font-size: 14px; color: #6B7280;">Missões</div>
+              <div style="font-size: 12px; color: #10B981; font-weight: 600; margin-top: 4px;">${percentage}%</div>
+            </div>
+          </div>
+        `;
+        childrenContainer.appendChild(card);
+      });
+
+      // Renderizar gráficos (versão simplificada com barras)
+      const chartsContainer = document.getElementById('dashboardChartsContainer');
+      chartsContainer.innerHTML = '';
+
+      const categories = [
+        { name: 'Comportamento', key: 'comportamento', color: '#10B981', icon: '🎯' },
+        { name: 'Higiene', key: 'higiene', color: '#3B82F6', icon: '🧴' },
+        { name: 'Estudos', key: 'estudos', color: '#8B5CF6', icon: '📚' },
+        { name: 'Bem-estar', key: 'bemEstar', color: '#F59E0B', icon: '😊' }
+      ];
+
+      categories.forEach(cat => {
+        const avg = Math.round(
+          appData.children.reduce((sum, child) => sum + child.status[cat.key], 0) / appData.children.length
+        );
+
+        const chartCard = document.createElement('div');
+        chartCard.style.cssText = 'background: #F9FAFB; border-radius: 12px; padding: 20px; margin-bottom: 16px;';
+        chartCard.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-weight: 700; font-size: 16px;">${cat.icon} ${cat.name}</div>
+            <div style="font-size: 24px; font-weight: 700; color: ${cat.color};">${avg}%</div>
+          </div>
+          <div style="height: 12px; background: #E5E7EB; border-radius: 6px; overflow: hidden;">
+            <div style="height: 100%; width: ${avg}%; background: ${cat.color}; transition: width 0.3s ease;"></div>
+          </div>
+        `;
+        chartsContainer.appendChild(chartCard);
+      });
+    }
+
+    async function resetAllMissions() {
+      if (!confirm('⚠️ Tem certeza que deseja resetar todas as missões de todas as crianças?\n\nIsso irá marcar todas as missões como não completadas para começar um novo dia.')) {
+        return;
+      }
+
+      appData.children.forEach(child => {
+        child.missions.forEach(mission => {
+          mission.completed = false;
+          mission.quality = null;
+        });
+        // Resetar status para 100%
+        child.status = {
+          comportamento: 100,
+          higiene: 100,
+          estudos: 100,
+          bemEstar: 100
+        };
+      });
+
+      await saveData();
+      renderDashboard();
+      alert('✅ Todas as missões foram resetadas! Bom novo dia!');
+    }
+
+    function exportData() {
+      const dataStr = JSON.stringify(appData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `kidsroutine_backup_${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      alert('✅ Dados exportados com sucesso!');
     }
 
     // Sincronização em tempo real

@@ -478,6 +478,66 @@
       border-color: #667eea;
       background: #EEF2FF;
     }
+    
+    /* Animações de Gamificação */
+    @keyframes pointsFloat {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      50% {
+        opacity: 1;
+        transform: translate(-50%, -70%) scale(1.2);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -100%) scale(0.8);
+      }
+    }
+    
+    @keyframes scaleIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+    
+    @keyframes scaleOut {
+      from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5);
+      }
+    }
+    
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes slideOutRight {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      to {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+    }
   </style>
 </head>
 <body>
@@ -512,6 +572,7 @@
           <div class="child-avatar" id="childAvatar">😊</div>
           <div>
             <div class="child-name" id="childName">Criança</div>
+            <div class="gamification-info" id="gamificationInfo" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
           </div>
         </div>
         <div class="header-actions">
@@ -660,6 +721,101 @@
 
     let currentMissionId = null;
     let selectedAvatar = '😊';
+    
+    // Constantes de Gamificação
+    const LEVELS = [
+      { level: 1, title: '🥉 Aprendiz', minPoints: 0, maxPoints: 50 },
+      { level: 2, title: '🥉 Aprendiz II', minPoints: 51, maxPoints: 100 },
+      { level: 3, title: '🥉 Aprendiz III', minPoints: 101, maxPoints: 150 },
+      { level: 4, title: '🥉 Aprendiz IV', minPoints: 151, maxPoints: 200 },
+      { level: 5, title: '🥉 Aprendiz V', minPoints: 201, maxPoints: 250 },
+      { level: 6, title: '🥈 Herói Iniciante', minPoints: 251, maxPoints: 350 },
+      { level: 7, title: '🥈 Herói Iniciante II', minPoints: 351, maxPoints: 450 },
+      { level: 8, title: '🥈 Herói Iniciante III', minPoints: 451, maxPoints: 550 },
+      { level: 9, title: '🥈 Herói Iniciante IV', minPoints: 551, maxPoints: 650 },
+      { level: 10, title: '🥈 Herói Iniciante V', minPoints: 651, maxPoints: 750 },
+      { level: 11, title: '🥇 Super Herói', minPoints: 751, maxPoints: 900 },
+      { level: 12, title: '🥇 Super Herói II', minPoints: 901, maxPoints: 1050 },
+      { level: 13, title: '🥇 Super Herói III', minPoints: 1051, maxPoints: 1200 },
+      { level: 14, title: '🥇 Super Herói IV', minPoints: 1201, maxPoints: 1350 },
+      { level: 15, title: '🥇 Super Herói V', minPoints: 1351, maxPoints: 1500 },
+      { level: 16, title: '💎 Campeão', minPoints: 1501, maxPoints: 1750 },
+      { level: 17, title: '💎 Campeão II', minPoints: 1751, maxPoints: 2000 },
+      { level: 18, title: '💎 Campeão III', minPoints: 2001, maxPoints: 2250 },
+      { level: 19, title: '💎 Campeão IV', minPoints: 2251, maxPoints: 2500 },
+      { level: 20, title: '💎 Campeão V', minPoints: 2501, maxPoints: 3000 },
+      { level: 21, title: '👑 Lenda', minPoints: 3001, maxPoints: 4000 },
+      { level: 22, title: '👑 Lenda II', minPoints: 4001, maxPoints: 5000 },
+      { level: 23, title: '👑 Lenda III', minPoints: 5001, maxPoints: 6000 },
+      { level: 24, title: '👑 Lenda IV', minPoints: 6001, maxPoints: 7500 },
+      { level: 25, title: '👑 Lenda Suprema', minPoints: 7501, maxPoints: 999999 }
+    ];
+    
+    const MISSION_POINTS = {
+      'manter_calma': { perfect: 15, partial: 7 },
+      'momento_gratidao': { perfect: 15, partial: 7 },
+      'preparar_uniforme': { perfect: 12, partial: 6 },
+      'arrumar_mochila': { perfect: 12, partial: 6 },
+      'tirar_lancheira': { perfect: 8, partial: 4 },
+      'alimentar_direito': { perfect: 15, partial: 7 },
+      'beber_liquido': { perfect: 10, partial: 5 },
+      'deitar_horario': { perfect: 15, partial: 7 },
+      'escovar_dentes': { perfect: 12, partial: 6 },
+      'ler_livro': { perfect: 12, partial: 6 },
+      'brincar': { perfect: 10, partial: 5 }
+    };
+    
+    const BONUS_POINTS = {
+      perfectDay: 30,
+      allPerfect: 50,
+      streakDaily: 3,
+      categoryPerfect: 10
+    };
+    
+    const ACCESSORIES = [
+      { id: 'crown_simple', name: '👑 Coroa Simples', emoji: '👑', unlockType: 'level', unlockValue: 5, position: 'top' },
+      { id: 'star_gold', name: '⭐ Estrela Dourada', emoji: '⭐', unlockType: 'level', unlockValue: 10, position: 'top' },
+      { id: 'medal_honor', name: '🎖️ Medalha de Honra', emoji: '🎖️', unlockType: 'level', unlockValue: 15, position: 'chest' },
+      { id: 'crown_diamond', name: '💎 Coroa de Diamante', emoji: '💎', unlockType: 'level', unlockValue: 20, position: 'top' },
+      { id: 'aura_rainbow', name: '🌈 Aura Arco-íris', emoji: '🌈', unlockType: 'level', unlockValue: 25, position: 'background' },
+      { id: 'flame_fire', name: '🔥 Chama de Fogo', emoji: '🔥', unlockType: 'streak', unlockValue: 7, position: 'side' },
+      { id: 'lightning_gold', name: '⚡ Raio Dourado', emoji: '⚡', unlockType: 'streak', unlockValue: 14, position: 'side' },
+      { id: 'star_bright', name: '🌟 Estrela Brilhante', emoji: '🌟', unlockType: 'streak', unlockValue: 30, position: 'top' },
+      { id: 'medal_gold', name: '🏅 Medalha de Ouro', emoji: '🏅', unlockType: 'achievement', unlockValue: 'perfect_week', position: 'chest' },
+      { id: 'cape_hero', name: '🦸 Capa de Super-Herói', emoji: '🦸', unlockType: 'missions', unlockValue: 100, position: 'back' },
+      { id: 'glasses_behavior', name: '🎯 Óculos de Comportamento', emoji: '🎯', unlockType: 'category', unlockValue: 'comportamento', position: 'face' },
+      { id: 'shine_hygiene', name: '🧼 Brilho de Higiene', emoji: '✨', unlockType: 'category', unlockValue: 'higiene', position: 'background' },
+      { id: 'hat_studies', name: '📚 Chapéu de Estudos', emoji: '🎓', unlockType: 'category', unlockValue: 'estudos', position: 'top' },
+      { id: 'smile_wellbeing', name: '😊 Sorriso Radiante', emoji: '😄', unlockType: 'category', unlockValue: 'bemEstar', position: 'face' }
+    ];
+    
+    const ACHIEVEMENTS = [
+      { id: 'fire_starter', name: '🔥 Fogo Iniciante', description: '3 dias seguidos', type: 'streak', value: 3, points: 20 },
+      { id: 'fire_strong', name: '🔥🔥 Chama Forte', description: '7 dias seguidos', type: 'streak', value: 7, points: 50 },
+      { id: 'fire_inferno', name: '🔥🔥🔥 Inferno', description: '14 dias seguidos', type: 'streak', value: 14, points: 100 },
+      { id: 'star_shooting', name: '🌟 Estrela Cadente', description: '30 dias seguidos', type: 'streak', value: 30, points: 200 },
+      { id: 'perfectionist', name: '💯 Perfeccionista', description: '10 dias com 100% em todas categorias', type: 'perfectDays', value: 10, points: 100 },
+      { id: 'behavior_master', name: '🎯 Mestre do Comportamento', description: '30 dias com Comportamento 100%', type: 'categoryStreak', value: { category: 'comportamento', days: 30 }, points: 150 },
+      { id: 'studies_genius', name: '📚 Gênio dos Estudos', description: '30 dias com Estudos 100%', type: 'categoryStreak', value: { category: 'estudos', days: 30 }, points: 150 },
+      { id: 'happiness_total', name: '😊 Felicidade Total', description: '30 dias com Bem-estar 100%', type: 'categoryStreak', value: { category: 'bemEstar', days: 30 }, points: 150 },
+      { id: 'rainbow', name: '🌈 Arco-íris', description: 'Completar todas as missões de um dia', type: 'perfectDay', value: 1, points: 30 },
+      { id: 'supernova', name: '⭐ Supernova', description: '7 dias perfeitos seguidos', type: 'perfectDays', value: 7, points: 150 },
+      { id: 'royalty', name: '👑 Realeza', description: 'Alcançar Nível 20', type: 'level', value: 20, points: 200 },
+      { id: 'superhero', name: '🦸 Super-Herói', description: 'Completar 500 missões', type: 'totalMissions', value: 500, points: 300 }
+    ];
+    
+    const DEFAULT_REWARDS = [
+      { id: 'ice_cream', name: '🍦 Sorvete Extra', points: 50, category: 'food' },
+      { id: 'tv_time', name: '📺 30min TV Extra', points: 75, category: 'screen' },
+      { id: 'game_time', name: '🎮 1h de Videogame', points: 100, category: 'screen' },
+      { id: 'choose_activity', name: '🎨 Escolher Atividade do Fim de Semana', points: 150, category: 'activity' },
+      { id: 'sleepover', name: '🎉 Festa do Pijama', points: 200, category: 'special' },
+      { id: 'surprise_gift', name: '🎁 Presente Surpresa', points: 500, category: 'special' },
+      { id: 'movie_theater', name: '🎬 Cinema com a Família', points: 300, category: 'outing' },
+      { id: 'park_day', name: '🏞️ Dia no Parque', points: 200, category: 'outing' },
+      { id: 'toy_small', name: '🧸 Brinquedo Pequeno', points: 250, category: 'toy' },
+      { id: 'book_new', name: '📖 Livro Novo', points: 150, category: 'educational' }
+    ];
 
     // Atividades padrão
     const defaultActivities = [
@@ -958,6 +1114,23 @@
           needsSave = true;
         }
         
+        // Adicionar gamificação se não existir
+        if (!child.gamification) {
+          child.gamification = {
+            points: 0,
+            level: 1,
+            streak: 0,
+            lastCompletionDate: null,
+            totalMissionsCompleted: 0,
+            perfectDays: 0,
+            achievements: [],
+            unlockedAccessories: [],
+            equippedAccessories: [],
+            rewards: []
+          };
+          needsSave = true;
+        }
+        
         // Sincronizar nomes, descrições e ações das missões com os templates atualizados
         if (child.missions) {
           child.missions.forEach(mission => {
@@ -1126,6 +1299,18 @@
           estudos: 100,
           bemEstar: 100
         },
+        gamification: {
+          points: 0,
+          level: 1,
+          streak: 0,
+          lastCompletionDate: null,
+          totalMissionsCompleted: 0,
+          perfectDays: 0,
+          achievements: [],
+          unlockedAccessories: [],
+          equippedAccessories: [],
+          rewards: []
+        },
         missions: defaultActivities.map(act => ({
           ...act,
           completed: false,
@@ -1157,6 +1342,17 @@
       
       document.getElementById('childAvatar').textContent = child.avatar;
       document.getElementById('childName').textContent = child.name;
+      
+      // Atualizar informações de gamificação
+      const levelInfo = LEVELS.find(l => child.gamification.points >= l.minPoints && child.gamification.points <= l.maxPoints);
+      const gamificationHTML = `
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+          <div>🎯 <strong>${child.gamification.points}</strong> pontos</div>
+          <div>🏆 <strong>Nível ${child.gamification.level}</strong> - ${levelInfo ? levelInfo.title : ''}</div>
+          <div>🔥 <strong>${child.gamification.streak}</strong> dias seguidos</div>
+        </div>
+      `;
+      document.getElementById('gamificationInfo').innerHTML = gamificationHTML;
 
       // Atualizar barras de status
       document.getElementById('comportamentoBar').style.width = child.status.comportamento + '%';
@@ -1265,6 +1461,23 @@
       Object.keys(mission.effects).forEach(key => {
         child.status[key] = Math.min(100, child.status[key] + (mission.effects[key] * multiplier));
       });
+      
+      // Calcular pontos
+      const points = calculateMissionPoints(missionId, quality);
+      child.gamification.points += points;
+      child.gamification.totalMissionsCompleted++;
+      
+      // Atualizar nível
+      updateLevel(child);
+      
+      // Verificar conquistas
+      checkAchievements(child);
+      
+      // Verificar adereços desbloqueados
+      checkUnlockedAccessories(child);
+      
+      // Mostrar animação de pontos
+      showPointsAnimation(points, quality);
 
       closeQualityModal();
       await saveData();
@@ -1273,6 +1486,199 @@
 
     async function skipMission(missionId) {
       await completeMission(missionId, 0);
+    }
+    
+    // Funções de Gamificação
+    function calculateMissionPoints(missionId, quality) {
+      const missionConfig = MISSION_POINTS[missionId];
+      if (!missionConfig) return 0;
+      
+      if (quality === 100) return missionConfig.perfect;
+      if (quality === 50) return missionConfig.partial;
+      return 0;
+    }
+    
+    function updateLevel(child) {
+      const points = child.gamification.points;
+      const currentLevel = LEVELS.find(l => points >= l.minPoints && points <= l.maxPoints);
+      
+      if (currentLevel && currentLevel.level !== child.gamification.level) {
+        const oldLevel = child.gamification.level;
+        child.gamification.level = currentLevel.level;
+        
+        // Mostrar notificação de subida de nível
+        if (currentLevel.level > oldLevel) {
+          showLevelUpNotification(currentLevel);
+        }
+      }
+    }
+    
+    function checkAchievements(child) {
+      const newAchievements = [];
+      
+      ACHIEVEMENTS.forEach(achievement => {
+        // Verificar se já tem essa conquista
+        if (child.gamification.achievements.includes(achievement.id)) return;
+        
+        let unlocked = false;
+        
+        switch(achievement.type) {
+          case 'streak':
+            unlocked = child.gamification.streak >= achievement.value;
+            break;
+          case 'perfectDays':
+            unlocked = child.gamification.perfectDays >= achievement.value;
+            break;
+          case 'level':
+            unlocked = child.gamification.level >= achievement.value;
+            break;
+          case 'totalMissions':
+            unlocked = child.gamification.totalMissionsCompleted >= achievement.value;
+            break;
+          case 'perfectDay':
+            const allCompleted = child.missions.every(m => m.completed && m.quality === 100);
+            unlocked = allCompleted;
+            break;
+        }
+        
+        if (unlocked) {
+          child.gamification.achievements.push(achievement.id);
+          child.gamification.points += achievement.points;
+          newAchievements.push(achievement);
+        }
+      });
+      
+      // Mostrar notificações de conquistas
+      if (newAchievements.length > 0) {
+        showAchievementNotification(newAchievements);
+      }
+    }
+    
+    function checkUnlockedAccessories(child) {
+      ACCESSORIES.forEach(accessory => {
+        // Verificar se já tem esse adereço
+        if (child.gamification.unlockedAccessories.includes(accessory.id)) return;
+        
+        let unlocked = false;
+        
+        switch(accessory.unlockType) {
+          case 'level':
+            unlocked = child.gamification.level >= accessory.unlockValue;
+            break;
+          case 'streak':
+            unlocked = child.gamification.streak >= accessory.unlockValue;
+            break;
+          case 'missions':
+            unlocked = child.gamification.totalMissionsCompleted >= accessory.unlockValue;
+            break;
+        }
+        
+        if (unlocked) {
+          child.gamification.unlockedAccessories.push(accessory.id);
+          // Equipar automaticamente o primeiro adereço desbloqueado
+          if (child.gamification.equippedAccessories.length === 0) {
+            child.gamification.equippedAccessories.push(accessory.id);
+          }
+        }
+      });
+    }
+    
+    function showPointsAnimation(points, quality) {
+      if (points === 0) return;
+      
+      const color = quality === 100 ? '#4ade80' : quality === 50 ? '#fbbf24' : '#ef4444';
+      const emoji = quality === 100 ? '⭐' : quality === 50 ? '⚠️' : '❌';
+      
+      // Criar elemento de animação
+      const animation = document.createElement('div');
+      animation.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 48px;
+        font-weight: bold;
+        color: ${color};
+        z-index: 10000;
+        animation: pointsFloat 2s ease-out forwards;
+        pointer-events: none;
+      `;
+      animation.textContent = `${emoji} +${points} pontos!`;
+      
+      document.body.appendChild(animation);
+      
+      setTimeout(() => {
+        animation.remove();
+      }, 2000);
+    }
+    
+    function showLevelUpNotification(level) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 10000;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        animation: scaleIn 0.5s ease-out;
+      `;
+      notification.innerHTML = `
+        <div style="font-size: 64px; margin-bottom: 10px;">🎉</div>
+        <div>Nível ${level.level} Alcançado!</div>
+        <div style="font-size: 18px; margin-top: 10px; opacity: 0.9;">${level.title}</div>
+      `;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.style.animation = 'scaleOut 0.5s ease-in forwards';
+        setTimeout(() => notification.remove(), 500);
+      }, 3000);
+    }
+    
+    function showAchievementNotification(achievements) {
+      achievements.forEach((achievement, index) => {
+        setTimeout(() => {
+          const notification = document.createElement('div');
+          notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            z-index: 10000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: slideInRight 0.5s ease-out;
+            max-width: 300px;
+          `;
+          notification.innerHTML = `
+            <div style="font-size: 32px; margin-bottom: 5px;">🏆</div>
+            <div>Conquista Desbloqueada!</div>
+            <div style="font-size: 14px; margin-top: 5px;">${achievement.name}</div>
+            <div style="font-size: 12px; opacity: 0.8;">${achievement.description}</div>
+            <div style="font-size: 14px; margin-top: 5px; color: #ffd700;">+${achievement.points} pontos!</div>
+          `;
+          
+          document.body.appendChild(notification);
+          
+          setTimeout(() => {
+            notification.style.animation = 'slideOutRight 0.5s ease-in forwards';
+            setTimeout(() => notification.remove(), 500);
+          }, 4000);
+        }, index * 500);
+      });
     }
 
     async function saveData() {

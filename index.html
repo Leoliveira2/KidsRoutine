@@ -1825,27 +1825,44 @@
       let updatedCount = 0;
       
       appData.children.forEach(child => {
-        child.missions.forEach(mission => {
-          const template = defaultActivities.find(a => a.id === mission.id);
-          if (template) {
-            // Atualizar apenas se houver diferença
-            if (mission.name !== template.name || 
-                mission.description !== template.description || 
-                mission.action !== template.action) {
+        // Se o número de missões for diferente, substituir todas
+        if (child.missions.length !== defaultActivities.length) {
+          child.missions = defaultActivities.map(template => ({
+            ...template,
+            completed: false,
+            quality: null
+          }));
+          updatedCount += defaultActivities.length;
+        } else {
+          // Atualizar missão por missão baseado na posição
+          child.missions.forEach((mission, index) => {
+            const template = defaultActivities[index];
+            if (template) {
+              // Sempre atualizar para garantir sincronização
+              const oldCompleted = mission.completed;
+              const oldQuality = mission.quality;
+              
+              mission.id = template.id;
               mission.name = template.name;
               mission.description = template.description;
               mission.action = template.action;
               mission.effects = template.effects;
               mission.qualityOptions = template.qualityOptions;
+              mission.type = template.type;
+              
+              // Manter progresso
+              mission.completed = oldCompleted;
+              mission.quality = oldQuality;
+              
               updatedCount++;
             }
-          }
-        });
+          });
+        }
       });
       
       if (updatedCount > 0) {
         await saveData();
-        alert(`✅ ${updatedCount} missões foram atualizadas com sucesso!\n\nRecarregue a página para ver as mudanças.`);
+        alert(`✅ ${updatedCount} missões foram atualizadas com sucesso!\n\nRecarregando...`);
         location.reload();
       } else {
         alert('✅ Todas as missões já estão atualizadas!');

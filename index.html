@@ -203,6 +203,55 @@
 
     .child-avatar {
       font-size: 64px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .avatar-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .avatar-base {
+      font-size: 64px;
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      pointer-events: none;
+      z-index: 10;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .state-message {
+      margin: 10px 0;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    .state-warning {
+      background: #FEF3C7;
+      color: #92400E;
+      border-left: 4px solid #F59E0B;
+    }
+
+    .state-positive {
+      background: #D1FAE5;
+      color: #065F46;
+      border-left: 4px solid #10B981;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     .child-name {
@@ -575,6 +624,10 @@
             <div class="gamification-info" id="gamificationInfo" style="font-size: 12px; color: #666; margin-top: 5px;"></div>
           </div>
         </div>
+        <div id="avatarMessages" style="display: none; margin-top: 10px;"></div>
+        <div class="child-info" style="display: none;">
+          <div></div>
+        </div>
         <div class="header-actions">
           <button class="icon-btn" onclick="logout()">🔙 Voltar</button>
         </div>
@@ -696,6 +749,174 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
   <script>
+    // Sistema de Estados Visuais do Avatar
+    // Configuração de estados por missão
+    const AVATAR_STATES_CONFIG = {
+      'escovar_dentes': {
+        category: 'higiene',
+        states: [
+          { days: 2, state: 'dentes_amarelados_leve', message: '🦷 Seu avatar precisa escovar os dentes para ter um sorriso bonito!' },
+          { days: 3, state: 'dentes_amarelados', message: '🦷 Ops! Seu avatar está com os dentes bem amarelados. Que tal escovar?' }
+        ]
+      },
+      'deitar_horario': {
+        category: 'bem_estar',
+        states: [
+          { days: 2, state: 'olheiras_leves', message: '😴 Seu avatar está cansado! Dormir cedo ajuda a ter energia!' },
+          { days: 3, state: 'olheiras_marcadas', message: '😴 Seu avatar precisa descansar! Deitar no horário é importante!' }
+        ]
+      },
+      'alimentar_direito': {
+        category: 'bem_estar',
+        states: [
+          { days: 2, state: 'barriga_vazia', message: '🍽️ Seu avatar está com fome! Comer bem dá energia!' },
+          { days: 3, state: 'fraco', message: '🍽️ Seu avatar precisa de energia! Vamos comer direitinho?' }
+        ]
+      },
+      'beber_liquido': {
+        category: 'bem_estar',
+        states: [
+          { days: 2, state: 'com_sede', message: '💧 Seu avatar está com sede! Que tal beber água?' },
+          { days: 3, state: 'desidratado', message: '💧 Seu avatar precisa de água! Beber líquido é muito importante!' }
+        ]
+      },
+      'manter_calma': {
+        category: 'comportamento',
+        states: [
+          { days: 2, state: 'estressado', message: '😊 Seu avatar está estressado! Manter a calma ajuda a se sentir melhor!' },
+          { days: 3, state: 'muito_estressado', message: '😊 Seu avatar precisa de calma! Respirar fundo ajuda!' }
+        ]
+      }
+    };
+
+    // Overlays visuais (emojis que aparecem sobre o avatar)
+    const VISUAL_OVERLAYS = {
+      'dentes_amarelados_leve': { emoji: '😬', position: 'bottom', size: '0.6em', opacity: 0.7 },
+      'dentes_amarelados': { emoji: '😬', position: 'bottom', size: '0.7em', opacity: 1 },
+      'olheiras_leves': { emoji: '😪', position: 'center', size: '1em', opacity: 0.7 },
+      'olheiras_marcadas': { emoji: '😴', position: 'center', size: '1em', opacity: 1 },
+      'barriga_vazia': { emoji: '🍽️', position: 'bottom-right', size: '0.5em', opacity: 0.7 },
+      'fraco': { emoji: '💤', position: 'top-right', size: '0.5em', opacity: 1 },
+      'com_sede': { emoji: '💧', position: 'top-left', size: '0.5em', opacity: 0.7 },
+      'desidratado': { emoji: '💧💧', position: 'top-left', size: '0.5em', opacity: 1 },
+      'estressado': { emoji: '😤', position: 'center', size: '1em', opacity: 0.7 },
+      'muito_estressado': { emoji: '😠', position: 'center', size: '1em', opacity: 1 },
+      'brilhante': { emoji: '✨', position: 'top', size: '0.6em', opacity: 1 },
+      'feliz': { emoji: '😊', position: 'center', size: '1em', opacity: 1 },
+      'radiante': { emoji: '🌟', position: 'top', size: '0.7em', opacity: 1 }
+    };
+
+    function detectAvatarStates(child) {
+      const states = [];
+      const today = new Date().toISOString().split('T')[0];
+      const last7Days = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        last7Days.push(date.toISOString().split('T')[0]);
+      }
+      
+      Object.keys(AVATAR_STATES_CONFIG).forEach(missionId => {
+        const config = AVATAR_STATES_CONFIG[missionId];
+        let consecutiveDaysNotDone = 0;
+        
+        for (const dateStr of last7Days) {
+          if (dateStr === today) {
+            const mission = child.missions.find(m => m.id === missionId);
+            if (!mission || !mission.completed || mission.quality === 0) {
+              consecutiveDaysNotDone++;
+            } else {
+              break;
+            }
+          } else {
+            const historyEntry = child.history?.[dateStr];
+            if (historyEntry) {
+              const mission = historyEntry.missions?.find(m => m.id === missionId);
+              if (!mission || !mission.completed || mission.quality === 0) {
+                consecutiveDaysNotDone++;
+              } else {
+                break;
+              }
+            } else {
+              consecutiveDaysNotDone++;
+            }
+          }
+        }
+        
+        for (const stateConfig of config.states) {
+          if (consecutiveDaysNotDone >= stateConfig.days) {
+            states.push({
+              id: stateConfig.state,
+              message: stateConfig.message,
+              category: config.category,
+              daysNotDone: consecutiveDaysNotDone
+            });
+            break;
+          }
+        }
+      });
+      
+      const allMissionsCompleted = child.missions.every(m => m.completed && m.quality > 0);
+      if (allMissionsCompleted) {
+        states.push({ id: 'brilhante', message: '✨ Parabéns! Seu avatar está brilhante! Você completou todas as missões!', category: 'positive', daysNotDone: 0 });
+      }
+      
+      if (child.gamification?.streak >= 3) {
+        states.push({ id: 'feliz', message: '😊 Seu avatar está muito feliz! Você está mantendo uma ótima sequência!', category: 'positive', daysNotDone: 0 });
+      }
+      
+      const avgStatus = (child.status.comportamento + child.status.higiene + child.status.estudos + child.status.bemEstar) / 4;
+      if (avgStatus >= 80) {
+        states.push({ id: 'radiante', message: '🌟 Seu avatar está radiante! Você está indo muito bem!', category: 'positive', daysNotDone: 0 });
+      }
+      
+      return states;
+    }
+
+    function renderAvatarWithStates(baseAvatar, states) {
+      if (states.length === 0) {
+        return `<div class="avatar-base">${baseAvatar}</div>`;
+      }
+      
+      let overlaysHTML = '';
+      states.forEach(state => {
+        const overlay = VISUAL_OVERLAYS[state.id];
+        if (overlay) {
+          const positionStyles = {
+            'top': 'top: -10px; left: 50%; transform: translateX(-50%);',
+            'top-left': 'top: -5px; left: -5px;',
+            'top-right': 'top: -5px; right: -5px;',
+            'center': 'top: 50%; left: 50%; transform: translate(-50%, -50%);',
+            'bottom': 'bottom: -10px; left: 50%; transform: translateX(-50%);',
+            'bottom-left': 'bottom: -5px; left: -5px;',
+            'bottom-right': 'bottom: -5px; right: -5px;'
+          };
+          
+          overlaysHTML += `<div class="avatar-overlay" style="position: absolute; ${positionStyles[overlay.position]} font-size: ${overlay.size}; opacity: ${overlay.opacity}; pointer-events: none; z-index: 10;">${overlay.emoji}</div>`;
+        }
+      });
+      
+      return `<div class="avatar-container" style="position: relative; display: inline-block;"><div class="avatar-base">${baseAvatar}</div>${overlaysHTML}</div>`;
+    }
+
+    function showAvatarStateMessages(states) {
+      const negativeStates = states.filter(s => s.category !== 'positive');
+      const positiveStates = states.filter(s => s.category === 'positive');
+      
+      const container = document.getElementById('avatarMessages');
+      if (!container) return;
+      
+      if (negativeStates.length > 0) {
+        container.innerHTML = negativeStates.map(state => `<div class="state-message state-warning">${state.message}</div>`).join('');
+        container.style.display = 'block';
+      } else if (positiveStates.length > 0) {
+        container.innerHTML = positiveStates.slice(0, 1).map(state => `<div class="state-message state-positive">${state.message}</div>`).join('');
+        container.style.display = 'block';
+      } else {
+        container.style.display = 'none';
+      }
+    }
+
     // Configuração do Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD9xRp_7owU4y_v7YNea0e2IOsQK2ul8JQ",
@@ -1340,8 +1561,16 @@
     function renderChildScreen() {
       const child = appData.currentChild;
       
-      document.getElementById('childAvatar').textContent = child.avatar;
+      // Detectar estados do avatar
+      const avatarStates = detectAvatarStates(child);
+      
+      // Renderizar avatar com overlays
+      const avatarHTML = renderAvatarWithStates(child.avatar, avatarStates);
+      document.getElementById('childAvatar').innerHTML = avatarHTML;
       document.getElementById('childName').textContent = child.name;
+      
+      // Mostrar mensagens educativas
+      showAvatarStateMessages(avatarStates)
       
       // Atualizar informações de gamificação
       const levelInfo = LEVELS.find(l => child.gamification.points >= l.minPoints && child.gamification.points <= l.maxPoints);

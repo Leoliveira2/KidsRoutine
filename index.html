@@ -587,6 +587,329 @@
         transform: translateX(100%);
       }
     }
+    /* Modo Calma */
+    .calm-screen {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .calm-container {
+      background: white;
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 500px;
+      width: 100%;
+      margin-top: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+
+    .calm-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .calm-avatar {
+      font-size: 64px;
+      margin-bottom: 12px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .calm-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 8px;
+    }
+
+    .calm-subtitle {
+      color: #6B7280;
+      font-size: 15px;
+    }
+
+    .calm-activities {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .calm-activity-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+      border: 2px solid #d1fae5;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .calm-activity-card:hover {
+      transform: translateX(4px);
+      border-color: #6ee7b7;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    }
+
+    .calm-activity-icon {
+      font-size: 32px;
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .calm-activity-name {
+      font-weight: 700;
+      color: #374151;
+      font-size: 16px;
+    }
+
+    .calm-activity-desc {
+      color: #6B7280;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    /* Respiração */
+    .breathe-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #a8edea, #fed6e3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      transition: transform 4s ease-in-out;
+      box-shadow: 0 0 40px rgba(168, 237, 234, 0.5);
+    }
+
+    .breathe-circle.expand {
+      transform: scale(1.4);
+    }
+
+    .breathe-circle.contract {
+      transform: scale(0.8);
+    }
+
+    .breathe-text {
+      font-size: 22px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    .breathe-count {
+      font-size: 48px;
+      font-weight: 900;
+      color: #374151;
+      line-height: 1;
+    }
+
+    .breathe-instruction {
+      text-align: center;
+      color: #6B7280;
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+
+    .breathe-progress {
+      text-align: center;
+      color: #9CA3AF;
+      font-size: 14px;
+    }
+
+    /* Contagem */
+    .count-display {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .count-number {
+      font-size: 100px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+      margin-bottom: 20px;
+      animation: pulse 1s ease-in-out;
+    }
+
+    .count-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .count-dot {
+      font-size: 24px;
+      color: #E5E7EB;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    .count-dot.active {
+      color: #667eea;
+      transform: scale(1.3);
+    }
+
+    /* Sentimentos */
+    .feelings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .feeling-card {
+      text-align: center;
+      padding: 16px 8px;
+      border-radius: 16px;
+      border: 2px solid #E5E7EB;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .feeling-card:hover {
+      border-color: #667eea;
+      background: #f5f3ff;
+    }
+
+    .feeling-card.selected {
+      border-color: #667eea;
+      background: #ede9fe;
+      transform: scale(1.05);
+    }
+
+    .feeling-emoji {
+      font-size: 36px;
+      margin-bottom: 6px;
+    }
+
+    .feeling-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .feeling-response {
+      background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+      border: 2px solid #d1fae5;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      color: #065f46;
+      font-size: 15px;
+      line-height: 1.6;
+      margin-top: 16px;
+    }
+
+    /* Ajuda e Acordo */
+    .help-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .help-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+
+    .help-step-icon {
+      font-size: 28px;
+      min-width: 36px;
+      text-align: center;
+    }
+
+    .help-step-text {
+      color: #374151;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    /* Recompensa Calma */
+    .calm-reward {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      border-radius: 16px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-12px); }
+    }
+
+    /* Confetes */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* Notificação de pontos */
+    .points-popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 18px;
+      z-index: 10000;
+      animation: pointsFloat 2s ease forwards;
+      pointer-events: none;
+    }
+
+    @keyframes pointsFloat {
+      0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+      80% { opacity: 1; transform: translateX(-50%) translateY(-10px); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-30px); }
+    }
   </style>
 </head>
 <body>
@@ -629,6 +952,7 @@
           <div></div>
         </div>
         <div class="header-actions">
+          <button class="icon-btn btn-calm" onclick="openCalmMode()" style="background: linear-gradient(135deg, #a8edea, #fed6e3); border: none; padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; margin-right: 8px;">🧘 Calma</button>
           <button class="icon-btn" onclick="logout()">🔙 Voltar</button>
         </div>
       </div>
@@ -706,6 +1030,194 @@
 
       <button class="btn btn-primary" onclick="saveNewChild()">Salvar</button>
       <button class="btn btn-secondary" onclick="closeAddChildModal()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Modo Calma -->
+  <div id="calmModeScreen" class="calm-screen hidden">
+    <div class="calm-container">
+      <div class="calm-header">
+        <div class="calm-avatar" id="calmAvatar">🧘</div>
+        <h2 class="calm-title">Modo Calma</h2>
+        <p class="calm-subtitle" id="calmSubtitle">Vamos respirar juntos e nos acalmar 🌸</p>
+      </div>
+
+      <!-- Tela Inicial do Modo Calma -->
+      <div id="calmHome">
+        <p style="text-align: center; color: #6B7280; margin-bottom: 24px; font-size: 15px;">
+          Escolha uma atividade para se sentir melhor:
+        </p>
+        <div class="calm-activities">
+          <div class="calm-activity-card" onclick="startCalmActivity('breathe')">
+            <div class="calm-activity-icon">🌬️</div>
+            <div class="calm-activity-name">Respirar Fundo</div>
+            <div class="calm-activity-desc">Respiração guiada em 5 ciclos</div>
+          </div>
+          <div class="calm-activity-card" onclick="startCalmActivity('count')">
+            <div class="calm-activity-icon">🔢</div>
+            <div class="calm-activity-name">Contar até 5</div>
+            <div class="calm-activity-desc">Contagem visual e animada</div>
+          </div>
+          <div class="calm-activity-card" onclick="startCalmActivity('feelings')">
+            <div class="calm-activity-icon">💬</div>
+            <div class="calm-activity-name">Falar Sentimentos</div>
+            <div class="calm-activity-desc">Expresse como está se sentindo</div>
+          </div>
+          <div class="calm-activity-card" onclick="startCalmActivity('help')">
+            <div class="calm-activity-icon">🤝</div>
+            <div class="calm-activity-name">Aceitar Ajuda</div>
+            <div class="calm-activity-desc">Pedir ajuda é muito corajoso!</div>
+          </div>
+          <div class="calm-activity-card" onclick="startCalmActivity('agreement')">
+            <div class="calm-activity-icon">🤔</div>
+            <div class="calm-activity-name">Sugerir Acordo</div>
+            <div class="calm-activity-desc">Vamos encontrar uma solução juntos</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary" onclick="closeCalmMode()" style="margin-top: 20px;">Fechar</button>
+      </div>
+
+      <!-- Atividade: Respirar Fundo -->
+      <div id="calmBreathe" class="hidden">
+        <div class="breathe-circle" id="breatheCircle">
+          <div class="breathe-text" id="breatheText">Inspire</div>
+          <div class="breathe-count" id="breatheCount">4</div>
+        </div>
+        <p class="breathe-instruction" id="breatheInstruction">Inspire lentamente pelo nariz...</p>
+        <div class="breathe-progress">
+          <span id="breatheCycleInfo">Ciclo 1 de 5</span>
+        </div>
+        <button class="btn btn-secondary" onclick="stopCalmActivity()" style="margin-top: 20px;">Parar</button>
+      </div>
+
+      <!-- Atividade: Contar até 5 -->
+      <div id="calmCount" class="hidden">
+        <div class="count-display">
+          <div class="count-number" id="countNumber">1</div>
+          <div class="count-dots">
+            <span class="count-dot" id="dot1">●</span>
+            <span class="count-dot" id="dot2">●</span>
+            <span class="count-dot" id="dot3">●</span>
+            <span class="count-dot" id="dot4">●</span>
+            <span class="count-dot" id="dot5">●</span>
+          </div>
+        </div>
+        <p class="breathe-instruction" id="countInstruction">Vamos contar devagar juntos...</p>
+        <button class="btn btn-secondary" onclick="stopCalmActivity()" style="margin-top: 20px;">Parar</button>
+      </div>
+
+      <!-- Atividade: Falar Sentimentos -->
+      <div id="calmFeelings" class="hidden">
+        <p style="text-align: center; color: #374151; font-size: 16px; margin-bottom: 20px;">
+          Como você está se sentindo agora?
+        </p>
+        <div class="feelings-grid">
+          <div class="feeling-card" onclick="selectFeeling('bravo', this)">
+            <div class="feeling-emoji">😠</div>
+            <div class="feeling-name">Bravo</div>
+          </div>
+          <div class="feeling-card" onclick="selectFeeling('triste', this)">
+            <div class="feeling-emoji">😢</div>
+            <div class="feeling-name">Triste</div>
+          </div>
+          <div class="feeling-card" onclick="selectFeeling('assustado', this)">
+            <div class="feeling-emoji">😨</div>
+            <div class="feeling-name">Assustado</div>
+          </div>
+          <div class="feeling-card" onclick="selectFeeling('frustrado', this)">
+            <div class="feeling-emoji">😤</div>
+            <div class="feeling-name">Frustrado</div>
+          </div>
+          <div class="feeling-card" onclick="selectFeeling('cansado', this)">
+            <div class="feeling-emoji">😴</div>
+            <div class="feeling-name">Cansado</div>
+          </div>
+          <div class="feeling-card" onclick="selectFeeling('confuso', this)">
+            <div class="feeling-emoji">🤔</div>
+            <div class="feeling-name">Confuso</div>
+          </div>
+        </div>
+        <div id="feelingResponse" class="feeling-response hidden"></div>
+        <button class="btn btn-secondary" onclick="stopCalmActivity()" style="margin-top: 20px;">Voltar</button>
+      </div>
+
+      <!-- Atividade: Aceitar Ajuda -->
+      <div id="calmHelp" class="hidden">
+        <div class="help-content">
+          <div style="font-size: 80px; text-align: center; margin-bottom: 20px;">🤝</div>
+          <h3 style="text-align: center; color: #374151; margin-bottom: 16px;">Pedir ajuda é muito corajoso!</h3>
+          <p style="text-align: center; color: #6B7280; margin-bottom: 24px; line-height: 1.6;">
+            Todo mundo precisa de ajuda às vezes. Isso não é fraqueza, é inteligência!
+          </p>
+          <div class="help-steps">
+            <div class="help-step">
+              <div class="help-step-icon">🙋</div>
+              <div class="help-step-text">Vá até uma pessoa de confiança</div>
+            </div>
+            <div class="help-step">
+              <div class="help-step-icon">💬</div>
+              <div class="help-step-text">Diga como está se sentindo</div>
+            </div>
+            <div class="help-step">
+              <div class="help-step-icon">🤝</div>
+              <div class="help-step-text">Peça ajuda com carinho</div>
+            </div>
+            <div class="help-step">
+              <div class="help-step-icon">❤️</div>
+              <div class="help-step-text">Aceite o apoio com gratidão</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="completeCalmActivity('help')" style="margin-top: 20px;">Fiz isso! ❤️</button>
+          <button class="btn btn-secondary" onclick="stopCalmActivity()" style="margin-top: 8px;">Voltar</button>
+        </div>
+      </div>
+
+      <!-- Atividade: Sugerir Acordo -->
+      <div id="calmAgreement" class="hidden">
+        <div class="agreement-content">
+          <div style="font-size: 80px; text-align: center; margin-bottom: 20px;">🤝</div>
+          <h3 style="text-align: center; color: #374151; margin-bottom: 16px;">Vamos encontrar uma solução!</h3>
+          <p style="text-align: center; color: #6B7280; margin-bottom: 24px; line-height: 1.6;">
+            Quando discordamos de alguém, podemos encontrar um meio-termo juntos.
+          </p>
+          <div class="agreement-steps">
+            <div class="help-step">
+              <div class="help-step-icon">🙋</div>
+              <div class="help-step-text">Explique o que você quer</div>
+            </div>
+            <div class="help-step">
+              <div class="help-step-icon">👂</div>
+              <div class="help-step-text">Ouve o que a outra pessoa quer</div>
+            </div>
+            <div class="help-step">
+              <div class="help-step-icon">💡</div>
+              <div class="help-step-text">Pense em uma ideia que serve para os dois</div>
+            </div>
+            <div class="help-step">
+              <div class="help-step-icon">🤝</div>
+              <div class="help-step-text">Proponha o acordo com gentileza</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="completeCalmActivity('agreement')" style="margin-top: 20px;">Propus um acordo! 🌟</button>
+          <button class="btn btn-secondary" onclick="stopCalmActivity()" style="margin-top: 8px;">Voltar</button>
+        </div>
+      </div>
+
+      <!-- Tela de Conclusão -->
+      <div id="calmComplete" class="hidden">
+        <div style="text-align: center;">
+          <div style="font-size: 80px; margin-bottom: 20px; animation: bounce 0.5s ease infinite alternate;">🌟</div>
+          <h3 style="color: #374151; margin-bottom: 12px; font-size: 22px;">Muito bem!</h3>
+          <p style="color: #6B7280; margin-bottom: 24px; font-size: 16px; line-height: 1.6;" id="calmCompleteMessage">
+            Você foi incrivel! Usar o Modo Calma é muito corajoso!
+          </p>
+          <div class="calm-reward">
+            <div style="font-size: 40px;">⭐</div>
+            <div style="font-weight: 700; color: #F59E0B; font-size: 18px;">+5 pontos de Calma!</div>
+          </div>
+          <button class="btn btn-primary" onclick="closeCalmMode()" style="margin-top: 20px;">Continuar 😊</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1708,6 +2220,11 @@
       // Mostrar animação de pontos
       showPointsAnimation(points, quality);
 
+      // Confetes para missão perfeita!
+      if (quality === 100) {
+        showConfetti();
+      }
+
       closeQualityModal();
       await saveData();
       renderChildScreen();
@@ -1960,17 +2477,37 @@
             📈 Média Semanal: ${weeklyStats.avgPercentage}% | ${weeklyStats.daysTracked} dias registrados
           </div>` : '';
 
+        // Estatísticas de gamificação
+        const gamif = child.gamification || {};
+        const points = gamif.points || 0;
+        const level = gamif.level || 1;
+        const streak = gamif.streak || 0;
+        const achievements = (gamif.achievements || []).length;
+
+        // Uso do Modo Calma
+        const calmUsage = child.calmModeUsage || [];
+        const todayStr = new Date().toISOString().split('T')[0];
+        const calmToday = calmUsage.filter(u => u.date === todayStr).length;
+        const calmTotal = calmUsage.length;
+        const calmInfo = calmTotal > 0 ? 
+          `<span style="background: #FDF2F8; color: #9D174D; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
+            🧘 Modo Calma: ${calmToday}x hoje | ${calmTotal}x total
+          </span>` : '';
+
         const card = document.createElement('div');
         card.className = 'mission-card';
         card.style.cursor = 'pointer';
         card.onclick = () => showChildTimeline(child.id);
         card.innerHTML = `
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="display: flex; align-items: flex-start; gap: 16px; flex: 1;">
               <div style="font-size: 48px;">${child.avatar}</div>
-              <div>
-                <div style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">${child.name}</div>
-                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <div style="flex: 1;">
+                <div style="font-size: 20px; font-weight: 700; margin-bottom: 4px;">${child.name}</div>
+                <div style="font-size: 12px; color: #667eea; font-weight: 600; margin-bottom: 10px;">
+                  ⭐ ${points} pts | 🏆 Nível ${level} | 🔥 ${streak} dias | 🏅 ${achievements} conquistas
+                </div>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                   <span style="background: #D1FAE5; color: #065F46; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
                     🎯 ${child.status.comportamento}% Comportamento
                   </span>
@@ -1983,15 +2520,16 @@
                   <span style="background: #FEF3C7; color: #92400E; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;">
                     😊 ${child.status.bemEstar}% Bem-estar
                   </span>
+                  ${calmInfo}
                 </div>
                 ${weeklyInfo}
               </div>
             </div>
-            <div style="text-align: center;">
+            <div style="text-align: center; min-width: 80px;">
               <div style="font-size: 32px; font-weight: 700; color: #667eea;">${completedCount}/${totalCount}</div>
               <div style="font-size: 14px; color: #6B7280;">Missões Hoje</div>
               <div style="font-size: 12px; color: #10B981; font-weight: 600; margin-top: 4px;">${percentage}%</div>
-              <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">👁️ Clique para ver histórico</div>
+              <div style="font-size: 11px; color: #9CA3AF; margin-top: 8px;">👁️ Histórico</div>
               <button onclick="event.stopPropagation(); deleteChild('${child.id}')" style="margin-top: 12px; background: #EF4444; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 600;">
                 🗑️ Excluir
               </button>
@@ -2674,6 +3212,282 @@
           }
         });
       }
+    }
+
+    // ============================================================
+    // MODO CALMA
+    // ============================================================
+    let calmTimer = null;
+    let breatheCycle = 0;
+    let breatheStep = 0;
+    let countStep = 0;
+
+    function openCalmMode() {
+      const child = appData.currentChild;
+      if (child) {
+        document.getElementById('calmAvatar').textContent = child.avatar || '🧘';
+      }
+      document.getElementById('childScreen').classList.add('hidden');
+      document.getElementById('calmModeScreen').classList.remove('hidden');
+      showCalmHome();
+    }
+
+    function closeCalmMode() {
+      stopCalmActivity();
+      document.getElementById('calmModeScreen').classList.add('hidden');
+      document.getElementById('childScreen').classList.remove('hidden');
+    }
+
+    function showCalmHome() {
+      document.getElementById('calmHome').classList.remove('hidden');
+      document.getElementById('calmBreathe').classList.add('hidden');
+      document.getElementById('calmCount').classList.add('hidden');
+      document.getElementById('calmFeelings').classList.add('hidden');
+      document.getElementById('calmHelp').classList.add('hidden');
+      document.getElementById('calmAgreement').classList.add('hidden');
+      document.getElementById('calmComplete').classList.add('hidden');
+    }
+
+    function startCalmActivity(type) {
+      document.getElementById('calmHome').classList.add('hidden');
+      document.getElementById('calmComplete').classList.add('hidden');
+
+      if (type === 'breathe') {
+        document.getElementById('calmBreathe').classList.remove('hidden');
+        startBreatheExercise();
+      } else if (type === 'count') {
+        document.getElementById('calmCount').classList.remove('hidden');
+        startCountExercise();
+      } else if (type === 'feelings') {
+        document.getElementById('calmFeelings').classList.remove('hidden');
+        document.getElementById('feelingResponse').classList.add('hidden');
+        document.querySelectorAll('.feeling-card').forEach(c => c.classList.remove('selected'));
+      } else if (type === 'help') {
+        document.getElementById('calmHelp').classList.remove('hidden');
+      } else if (type === 'agreement') {
+        document.getElementById('calmAgreement').classList.remove('hidden');
+      }
+    }
+
+    function stopCalmActivity() {
+      if (calmTimer) {
+        clearInterval(calmTimer);
+        clearTimeout(calmTimer);
+        calmTimer = null;
+      }
+      breatheCycle = 0;
+      breatheStep = 0;
+      countStep = 0;
+      showCalmHome();
+    }
+
+    // Exercício de Respiração
+    function startBreatheExercise() {
+      breatheCycle = 0;
+      runBreatheStep();
+    }
+
+    function runBreatheStep() {
+      const totalCycles = 5;
+      if (breatheCycle >= totalCycles) {
+        completeCalmActivity('breathe');
+        return;
+      }
+
+      const circle = document.getElementById('breatheCircle');
+      const breatheText = document.getElementById('breatheText');
+      const breatheCount = document.getElementById('breatheCount');
+      const instruction = document.getElementById('breatheInstruction');
+      const cycleInfo = document.getElementById('breatheCycleInfo');
+
+      cycleInfo.textContent = `Ciclo ${breatheCycle + 1} de ${totalCycles}`;
+
+      // Fase 1: Inspire (4 segundos)
+      breatheText.textContent = 'Inspire';
+      instruction.textContent = 'Inspire lentamente pelo nariz...';
+      circle.classList.remove('contract');
+      circle.classList.add('expand');
+      let count = 4;
+      breatheCount.textContent = count;
+
+      calmTimer = setInterval(() => {
+        count--;
+        breatheCount.textContent = count;
+        if (count <= 0) {
+          clearInterval(calmTimer);
+
+          // Fase 2: Segure (2 segundos)
+          breatheText.textContent = 'Segure';
+          instruction.textContent = 'Segure o ar...';
+          breatheCount.textContent = '2';
+          let hold = 2;
+          calmTimer = setInterval(() => {
+            hold--;
+            breatheCount.textContent = hold;
+            if (hold <= 0) {
+              clearInterval(calmTimer);
+
+              // Fase 3: Expire (4 segundos)
+              breatheText.textContent = 'Expire';
+              instruction.textContent = 'Solte o ar lentamente pela boca...';
+              circle.classList.remove('expand');
+              circle.classList.add('contract');
+              let expire = 4;
+              breatheCount.textContent = expire;
+              calmTimer = setInterval(() => {
+                expire--;
+                breatheCount.textContent = expire;
+                if (expire <= 0) {
+                  clearInterval(calmTimer);
+                  circle.classList.remove('contract');
+                  breatheCycle++;
+                  setTimeout(runBreatheStep, 500);
+                }
+              }, 1000);
+            }
+          }, 1000);
+        }
+      }, 1000);
+    }
+
+    // Exercício de Contagem
+    function startCountExercise() {
+      countStep = 0;
+      runCountStep();
+    }
+
+    function runCountStep() {
+      if (countStep >= 5) {
+        completeCalmActivity('count');
+        return;
+      }
+
+      countStep++;
+      const numberEl = document.getElementById('countNumber');
+      const instruction = document.getElementById('countInstruction');
+
+      numberEl.textContent = countStep;
+      numberEl.style.animation = 'none';
+      setTimeout(() => { numberEl.style.animation = 'pulse 0.5s ease'; }, 10);
+
+      // Ativar dots
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        if (dot) {
+          dot.classList.toggle('active', i <= countStep);
+        }
+      }
+
+      const messages = [
+        'Um... respira fundo...',
+        'Dois... você está indo bem...',
+        'Três... continue assim...',
+        'Quatro... quase lá...',
+        'Cinco! Muito bem! 🌟'
+      ];
+      instruction.textContent = messages[countStep - 1];
+
+      if (countStep < 5) {
+        calmTimer = setTimeout(runCountStep, 1500);
+      } else {
+        calmTimer = setTimeout(() => completeCalmActivity('count'), 1500);
+      }
+    }
+
+    // Selecionar sentimento
+    function selectFeeling(feeling, element) {
+      document.querySelectorAll('.feeling-card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+
+      const responses = {
+        'bravo': 'Ficar bravo é normal! Respira fundo e tente falar o que te deixou bravo. Isso vai ajudar muito! 💨',
+        'triste': 'Tudo bem ficar triste. Seus sentimentos são importantes! Quer um abraço? 🤗',
+        'assustado': 'Medo é uma emoção que nos protege! Respira fundo e lembra que você está seguro. 💙',
+        'frustrado': 'Frustração acontece quando as coisas não saem como queremos. É difícil, mas você consegue! 💪',
+        'cansado': 'Descansar é muito importante! Seu corpo e sua mente precisam de cuidado. 😴',
+        'confuso': 'Quando estamos confusos, pedir ajuda é a melhor coisa a fazer! Alguém pode te ajudar. 🤔'
+      };
+
+      const responseEl = document.getElementById('feelingResponse');
+      responseEl.textContent = responses[feeling];
+      responseEl.classList.remove('hidden');
+
+      setTimeout(() => completeCalmActivity('feelings'), 3000);
+    }
+
+    // Completar atividade de calma
+    function completeCalmActivity(type) {
+      if (calmTimer) {
+        clearInterval(calmTimer);
+        clearTimeout(calmTimer);
+        calmTimer = null;
+      }
+
+      // Esconder todas as atividades
+      ['calmBreathe', 'calmCount', 'calmFeelings', 'calmHelp', 'calmAgreement'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+
+      const messages = {
+        'breathe': 'Você respirou fundo 5 vezes! Isso ajuda muito a se acalmar. Parabéns! 🌬️',
+        'count': 'Você contou até 5 com calma! Isso é incrível! 🔢',
+        'feelings': 'Você expressou seus sentimentos! Isso é muito corajoso e importante! 💬',
+        'help': 'Pedir ajuda é um sinal de força! Você é muito corajoso! 🤝',
+        'agreement': 'Propor um acordo mostra que você é muito maduro! Parabéns! 🤔'
+      };
+
+      document.getElementById('calmCompleteMessage').textContent = messages[type] || 'Você foi incrivel!';
+      document.getElementById('calmComplete').classList.remove('hidden');
+
+      // Registrar uso do Modo Calma e dar pontos
+      const child = appData.currentChild;
+      if (child) {
+        if (!child.calmModeUsage) child.calmModeUsage = [];
+        child.calmModeUsage.push({
+          date: new Date().toISOString().split('T')[0],
+          activity: type,
+          timestamp: new Date().toISOString()
+        });
+
+        // Dar 5 pontos de bônus
+        if (!child.gamification) child.gamification = { points: 0, level: 1, streak: 0, achievements: [], accessories: [] };
+        child.gamification.points = (child.gamification.points || 0) + 5;
+
+        saveData();
+        showPointsAnimation('+5 🧘 Calma!');
+      }
+    }
+
+    // Animação de pontos
+    function showPointsAnimation(text) {
+      const popup = document.createElement('div');
+      popup.className = 'points-popup';
+      popup.textContent = text;
+      document.body.appendChild(popup);
+      setTimeout(() => popup.remove(), 2000);
+    }
+
+    // Confetes
+    function showConfetti() {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+
+      const colors = ['#667eea', '#764ba2', '#f59e0b', '#10b981', '#ef4444', '#3b82f6', '#ec4899'];
+      for (let i = 0; i < 80; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = Math.random() * 100 + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width = (Math.random() * 10 + 5) + 'px';
+        piece.style.height = (Math.random() * 10 + 5) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+        piece.style.animationDelay = Math.random() * 0.5 + 's';
+        container.appendChild(piece);
+      }
+
+      setTimeout(() => container.remove(), 3000);
     }
 
     // Inicializar

@@ -1006,6 +1006,25 @@
       </div>
     </div>
 
+    <!-- Frase de Parceria do Avatar -->
+    <div id="avatarPartnershipMsg" style="
+      margin: 0 16px 8px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+      color: white;
+      font-size: 14px;
+      font-style: italic;
+      line-height: 1.5;
+    "></div>
+
+    <!-- Pergunta do Dia -->
+    <div id="dailyQuestionSection" style="margin: 0 16px 8px;"></div>
+
+    <!-- Atributos de Competências -->
+    <div id="competenciesSection" style="margin: 0 16px 16px;"></div>
+
     <div class="missions-section">
       <h2 class="section-title">🎯 Missões do Dia</h2>
       <div id="missionsContainer"></div>
@@ -1475,7 +1494,310 @@
 
     let currentMissionId = null;
     let selectedAvatar = '😊';
-    
+
+    // ============================================================
+    // PERSONALIDADES DOS AVATARES
+    // ============================================================
+    const AVATAR_PERSONALITIES = {
+      '😊': {
+        name: 'Amigão',
+        trait: 'Gentil e acolhedor',
+        color: '#F59E0B',
+        phrases: {
+          greeting: [
+            'Que ótimo te ver! Vamos fazer um dia incrivel juntos?',
+            'Oi! Estou aqui do seu lado hoje!',
+            'Pronto para mais um dia de aventuras?'
+          ],
+          mission_complete: [
+            'Arrasou! Eu sabia que você ia conseguir!',
+            'Que orgulho! Fizemos juntos!',
+            'Isso é o que eu chamo de capricho!'
+          ],
+          mission_partial: [
+            'Tudo bem! Fazer um pouco já é melhor que nada.',
+            'Amanhã a gente tenta de novo, tudo bem?',
+            'Não foi perfeito, mas você tentou! Isso conta muito.'
+          ],
+          struggle: [
+            'Hoje eu também estava com preguiça. Conseguimos mesmo assim!',
+            'Dias difíceis acontecem. Amanhã é uma nova chance!',
+            'Você é mais forte do que pensa!'
+          ],
+          all_done: [
+            'INCRIVEL! Você completou tudo hoje! Estou muito orgulhoso!',
+            'Que dia perfeito! Você foi demais!',
+            'Parabéns! Hoje foi um dia de campeão!'
+          ]
+        }
+      },
+      '🦸': {
+        name: 'Super-Herói',
+        trait: 'Corajoso e determinado',
+        color: '#EF4444',
+        phrases: {
+          greeting: [
+            'Heróis não desistem! Vamos lá?',
+            'Cada missão cumprida te deixa mais forte!',
+            'O mundo precisa de você hoje!'
+          ],
+          mission_complete: [
+            'Missão cumprida! Você é um verdadeiro herói!',
+            'Poder ativado! Mais uma conquista!',
+            'Isso é digno de um super-herói!'
+          ],
+          mission_partial: [
+            'Até heróis precisam treinar mais. Amanhã você vai arrasar!',
+            'Não foi a missão mais fácil, mas você tentou!',
+            'Heróis aprendem com cada desafio!'
+          ],
+          struggle: [
+            'Hoje foi difícil para mim também. Mas nós não desistimos!',
+            'A coragem não é não ter medo. É agir mesmo com medo!',
+            'Cada dia difícil te deixa mais forte!'
+          ],
+          all_done: [
+            'SUPER-HERÓI DO DIA! Você completou todas as missões!',
+            'Poder máximo atingido! Você foi incrivel hoje!',
+            'A cidade está mais segura com você aqui!'
+          ]
+        }
+      },
+      '🦄': {
+        name: 'Aventureiro',
+        trait: 'Curioso e criativo',
+        color: '#8B5CF6',
+        phrases: {
+          greeting: [
+            'Nova aventura começa agora! Vamos explorar?',
+            'Cada dia é uma nova descoberta!',
+            'Que segredos vamos descobrir hoje?'
+          ],
+          mission_complete: [
+            'Descoberta feita! Você é um verdadeiro explorador!',
+            'Mais um tesouro conquistado!',
+            'Que aventura incrivel! Você arrasoou!'
+          ],
+          mission_partial: [
+            'Nem toda aventura sai perfeita. O importante é explorar!',
+            'Cada tentativa é parte da jornada!',
+            'Amanhã tem mais aventura esperando por você!'
+          ],
+          struggle: [
+            'Hoje eu também me perdi um pouco. Mas encontramos o caminho!',
+            'Aventureiros não desistem na primeira dificuldade!',
+            'Os melhores tesouros exigem esforço!'
+          ],
+          all_done: [
+            'AVENTURA COMPLETA! Você explorou tudo hoje!',
+            'Mapa completo! Você é o melhor explorador!',
+            'Que dia de descobertas! Você foi incrivel!'
+          ]
+        }
+      },
+      '🐉': {
+        name: 'Dragão',
+        trait: 'Persistente e poderoso',
+        color: '#10B981',
+        phrases: {
+          greeting: [
+            'Dragões são imparáveis! Vamos nessa?',
+            'Fogo e determinação! Hoje vai ser incrivel!',
+            'Pronto para mostrar seu poder?'
+          ],
+          mission_complete: [
+            'Fogo! Você é imparável!',
+            'Dragão em ação! Que poder!',
+            'Nada te para! Incrivel!'
+          ],
+          mission_partial: [
+            'Até dragões precisam de treino. Amanhã mais forte!',
+            'Cada chama que você solta te deixa mais poderoso!',
+            'Não foi perfeito, mas você mostrou força!'
+          ],
+          struggle: [
+            'Hoje foi pesado para mim também. Mas dragões não desistem!',
+            'A força real vem de dentro!',
+            'Dias difíceis fortalecem as asas!'
+          ],
+          all_done: [
+            'DRAGÃO SUPREMO! Todas as missões completas!',
+            'Poder máximo! Você foi incrivel hoje!',
+            'Que dia de fogo! Você arrasou!'
+          ]
+        }
+      },
+      '🐱': {
+        name: 'Gatinho',
+        trait: 'Curioso e independente',
+        color: '#F59E0B',
+        phrases: {
+          greeting: [
+            'Miau! Vamos explorar o dia juntos?',
+            'Gatinhos curiosos descobrem coisas incriveis!',
+            'Pronto para uma nova aventura felina?'
+          ],
+          mission_complete: [
+            'Miau de alegria! Você foi incrivel!',
+            'Gatinho satisfeito! Que capricho!',
+            'Ronron de orgulho! Você arrasou!'
+          ],
+          mission_partial: [
+            'Até gatinhos erram o pulo às vezes. Amanhã você acerta!',
+            'Não foi perfeito, mas você tentou! Isso é o que importa.',
+            'Gatinhos sempre caem de pé! Amanhã é nova chance!'
+          ],
+          struggle: [
+            'Hoje eu também fiquei com preguiça de sair da cama. Mas conseguimos!',
+            'Dias preguiçosos acontecem. O importante é tentar!',
+            'Você é mais forte do que parece!'
+          ],
+          all_done: [
+            'MIAU SUPREMO! Você completou tudo! Que gatinho incrivel!',
+            'Ronron de felicidade! Dia perfeito!',
+            'Você é o melhor gatinho do mundo!'
+          ]
+        }
+      },
+      '🐶': {
+        name: 'Cachorrinho',
+        trait: 'Leal e entusiasmado',
+        color: '#3B82F6',
+        phrases: {
+          greeting: [
+            'Au au! Que dia incrivel vai ser esse!',
+            'Estou animado para fazer tudo com você!',
+            'Vamos lá! Eu estou do seu lado!'
+          ],
+          mission_complete: [
+            'AU AU! Você foi incrivel! Estou feliz demais!',
+            'Que orgulho! Você arrasou!',
+            'Isso merece um au au de alegria!'
+          ],
+          mission_partial: [
+            'Tudo bem! Amanhã a gente tenta de novo juntos!',
+            'Eu ainda estou aqui do seu lado! Amanhã vai ser melhor!',
+            'Não foi perfeito, mas eu te amo do mesmo jeito!'
+          ],
+          struggle: [
+            'Hoje foi difícil para mim também. Mas estamos juntos!',
+            'Eu nunca vou te abandonar! Amanhã a gente tenta de novo!',
+            'Você é meu melhor amigo e eu acredito em você!'
+          ],
+          all_done: [
+            'AU AU AU! DIA PERFEITO! Você completou tudo! Estou louco de alegria!',
+            'Que dia incrivel! Você é o melhor!',
+            'Meu rabo não para de abanar de tanto orgulho!'
+          ]
+        }
+      },
+      '🦊': {
+        name: 'Raposa',
+        trait: 'Inteligente e perspicaz',
+        color: '#F97316',
+        phrases: {
+          greeting: [
+            'Raposas inteligentes planejam bem o dia!',
+            'Vamos usar nossa esperteza hoje?',
+            'Cada desafio tem uma solução. Vamos encontrar juntos!'
+          ],
+          mission_complete: [
+            'Que inteligência! Você resolveu com maestria!',
+            'Raposa esperta! Você foi incrivel!',
+            'Isso é o que eu chamo de estratégia perfeita!'
+          ],
+          mission_partial: [
+            'Raposas aprendem com cada tentativa. Amanhã será melhor!',
+            'Não foi perfeito, mas você já sabe o que melhorar!',
+            'Cada experiência nos deixa mais espertos!'
+          ],
+          struggle: [
+            'Hoje eu também precisei pensar mais. Mas encontramos o caminho!',
+            'Dias difíceis nos ensinam as lições mais importantes!',
+            'Você é mais inteligente do que imagina!'
+          ],
+          all_done: [
+            'RAPOSA MESTRE! Todas as missões completas! Que inteligência!',
+            'Estratégia perfeita executada! Você foi incrivel!',
+            'Que dia brilhante! Você arrasou!'
+          ]
+        }
+      },
+      '🐻': {
+        name: 'Ursinho',
+        trait: 'Organizado e confiável',
+        color: '#92400E',
+        phrases: {
+          greeting: [
+            'Ursinhos organizados têm os melhores dias!',
+            'Vamos deixar tudo no lugar hoje?',
+            'Um passo de cada vez. Vamos lá!'
+          ],
+          mission_complete: [
+            'Que organização! Você foi incrivel!',
+            'Ursinho satisfeito! Tudo no lugar!',
+            'Isso é o que eu chamo de responsabilidade!'
+          ],
+          mission_partial: [
+            'Tudo bem! Amanhã a gente organiza melhor!',
+            'Não foi perfeito, mas você tentou! Isso conta muito.',
+            'Ursinhos persistentes sempre chegam lá!'
+          ],
+          struggle: [
+            'Hoje foi um dia bagunçado para mim também. Mas conseguimos!',
+            'Até ursinhos organizados têm dias difíceis. Amanhã será melhor!',
+            'Você é mais capaz do que pensa!'
+          ],
+          all_done: [
+            'URSINHO CAMPEÃO! Tudo organizado e completo! Que dia!',
+            'Perfeito! Você foi incrivel hoje!',
+            'Que dia bem organizado! Você arrasou!'
+          ]
+        }
+      }
+    };
+
+    // ============================================================
+    // ATRIBUTOS DE COMPETÊNCIAS (crescem lentamente, nunca diminuem)
+    // ============================================================
+    const COMPETENCY_ATTRIBUTES = [
+      { id: 'responsabilidade', name: 'Responsabilidade', icon: '💪', color: '#3B82F6', description: 'Cumprir compromissos e cuidar das próprias coisas' },
+      { id: 'organizacao', name: 'Organização', icon: '📚', color: '#8B5CF6', description: 'Manter as coisas no lugar e planejar bem' },
+      { id: 'gentileza', name: 'Gentileza', icon: '❤️', color: '#EC4899', description: 'Ser cuidadoso e respeitoso com todos' },
+      { id: 'coragem', name: 'Coragem', icon: '🔥', color: '#EF4444', description: 'Enfrentar desafios mesmo quando é difícil' },
+      { id: 'curiosidade', name: 'Curiosidade', icon: '🔍', color: '#F59E0B', description: 'Querer aprender e descobrir coisas novas' },
+      { id: 'autonomia', name: 'Autonomia', icon: '⭐', color: '#10B981', description: 'Fazer as coisas por conta própria' }
+    ];
+
+    // Mapeamento de missões para competências
+    const MISSION_COMPETENCIES = {
+      'manter_calma': ['coragem', 'gentileza'],
+      'preparar_uniforme': ['responsabilidade', 'organizacao', 'autonomia'],
+      'arrumar_mochila': ['responsabilidade', 'organizacao', 'autonomia'],
+      'tirar_lancheira': ['responsabilidade', 'organizacao'],
+      'momento_gratidao': ['gentileza', 'curiosidade'],
+      'alimentar_direito': ['responsabilidade', 'autonomia'],
+      'beber_liquido': ['responsabilidade', 'autonomia'],
+      'ler_livro': ['curiosidade', 'autonomia'],
+      'deitar_horario': ['responsabilidade', 'coragem'],
+      'escovar_dentes': ['responsabilidade', 'autonomia'],
+      'brincar': ['curiosidade', 'coragem']
+    };
+
+    // Perguntas do dia por categoria
+    const DAILY_QUESTIONS = [
+      { id: 'q1', text: 'O que foi mais difícil hoje?', category: 'reflexao', icon: '🤔' },
+      { id: 'q2', text: 'Você ajudou alguém hoje sem ninguém pedir?', category: 'gentileza', icon: '❤️' },
+      { id: 'q3', text: 'O que você faria diferente amanhã?', category: 'reflexao', icon: '💡' },
+      { id: 'q4', text: 'Qual missão você faria primeiro se pudesse escolher?', category: 'autonomia', icon: '🎯' },
+      { id: 'q5', text: 'Você descobriu algo novo hoje?', category: 'curiosidade', icon: '🔍' },
+      { id: 'q6', text: 'Como você se sentiu quando completou uma missão?', category: 'emocao', icon: '😊' },
+      { id: 'q7', text: 'Teve alguma coisa que você fez sozinho hoje?', category: 'autonomia', icon: '⭐' },
+      { id: 'q8', text: 'O que você quer melhorar amanhã?', category: 'crescimento', icon: '🌱' },
+      { id: 'q9', text: 'Qual foi o momento mais legal do seu dia?', category: 'gratidao', icon: '🌟' },
+      { id: 'q10', text: 'Você pediu ajuda quando precisou hoje?', category: 'coragem', icon: '🤝' }
+    ];
+
     // Constantes de Gamificação
     const LEVELS = [
       { level: 1, title: '🥉 Aprendiz', minPoints: 0, maxPoints: 50 },
@@ -2090,6 +2412,114 @@
       renderChildScreen();
     }
 
+    // ============================================================
+    // COMPETÊNCIAS E PERGUNTA DO DIA
+    // ============================================================
+
+    function renderCompetencies(child) {
+      if (!child.competencies) child.competencies = {};
+      const section = document.getElementById('competenciesSection');
+      if (!section) return;
+
+      const items = COMPETENCY_ATTRIBUTES.map(attr => {
+        const value = child.competencies[attr.id] || 0;
+        const level = value < 20 ? 'Iniciando' : value < 50 ? 'Crescendo' : value < 80 ? 'Avançado' : 'Mestre';
+        const barWidth = Math.min(100, value);
+        return `
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <span style="font-size: 16px; min-width: 20px;">${attr.icon}</span>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                <span style="font-size: 11px; font-weight: 600; color: white;">${attr.name}</span>
+                <span style="font-size: 10px; color: rgba(255,255,255,0.7);">${level}</span>
+              </div>
+              <div style="height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden;">
+                <div style="height: 100%; width: ${barWidth}%; background: ${attr.color}; border-radius: 3px; transition: width 0.5s ease;"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      section.innerHTML = `
+        <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px;">
+          <div style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.8); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px;">Seus Superpoderes</div>
+          ${items}
+        </div>
+      `;
+    }
+
+    function updateCompetencies(child, missionId, quality) {
+      if (!child.competencies) child.competencies = {};
+      if (quality === 0) return; // Não fez, não ganha competência
+
+      const competencies = MISSION_COMPETENCIES[missionId] || [];
+      const gain = quality === 100 ? 3 : 1; // Perfeito ganha mais
+
+      competencies.forEach(comp => {
+        child.competencies[comp] = Math.min(100, (child.competencies[comp] || 0) + gain);
+      });
+    }
+
+    function renderDailyQuestion(child) {
+      const section = document.getElementById('dailyQuestionSection');
+      if (!section) return;
+
+      const today = new Date().toISOString().split('T')[0];
+      if (!child.dailyQuestions) child.dailyQuestions = {};
+
+      // Já respondeu hoje?
+      if (child.dailyQuestions[today]) {
+        const answered = child.dailyQuestions[today];
+        section.innerHTML = `
+          <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; margin-bottom: 8px;">
+            <div style="font-size: 11px; color: rgba(255,255,255,0.6); margin-bottom: 4px;">Reflexão de hoje:</div>
+            <div style="font-size: 13px; color: white; font-style: italic;">${answered.question}</div>
+            <div style="font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 6px; background: rgba(255,255,255,0.1); padding: 6px 10px; border-radius: 8px;">“${answered.answer}”</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Escolher pergunta do dia (baseada na data para ser consistente)
+      const dayIndex = new Date().getDate() % DAILY_QUESTIONS.length;
+      const question = DAILY_QUESTIONS[dayIndex];
+
+      section.innerHTML = `
+        <div style="background: rgba(255,255,255,0.12); border-radius: 12px; padding: 14px; margin-bottom: 8px;">
+          <div style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">${question.icon} Reflexão do Dia</div>
+          <div style="font-size: 14px; color: white; font-weight: 600; margin-bottom: 10px;">${question.text}</div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            ${['Sim!', 'Não muito', 'Mais ou menos', 'Ainda não'].map(opt => 
+              `<button onclick="answerDailyQuestion('${question.id}', '${question.text}', '${opt}')" style="
+                background: rgba(255,255,255,0.2);
+                border: 1px solid rgba(255,255,255,0.3);
+                color: white;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 12px;
+                cursor: pointer;
+                font-weight: 500;
+              ">${opt}</button>`
+            ).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    async function answerDailyQuestion(questionId, questionText, answer) {
+      const child = appData.currentChild;
+      if (!child.dailyQuestions) child.dailyQuestions = {};
+      const today = new Date().toISOString().split('T')[0];
+      child.dailyQuestions[today] = { questionId, question: questionText, answer, timestamp: new Date().toISOString() };
+      await saveData();
+      renderChildScreen();
+      showPointsAnimation('+3 🤔 Reflexão!');
+      // Dar 3 pontos pela reflexão
+      child.gamification.points = (child.gamification.points || 0) + 3;
+      await saveData();
+    }
+
     // Funções da Tela da Criança
     function renderChildScreen() {
       const child = appData.currentChild;
@@ -2103,7 +2533,24 @@
       document.getElementById('childName').textContent = child.name;
       
       // Mostrar mensagens educativas
-      showAvatarStateMessages(avatarStates)
+      showAvatarStateMessages(avatarStates);
+
+      // Frase de parceria do avatar (personalidade)
+      const personality = AVATAR_PERSONALITIES[child.avatar];
+      if (personality) {
+        const completedCount = child.missions.filter(m => m.completed).length;
+        const totalCount = child.missions.length;
+        let phraseCategory = 'greeting';
+        if (completedCount === totalCount && totalCount > 0) phraseCategory = 'all_done';
+        else if (completedCount > 0 && completedCount < totalCount * 0.4) phraseCategory = 'struggle';
+        const phrases = personality.phrases[phraseCategory];
+        const phrase = phrases[Math.floor(Date.now() / 3600000) % phrases.length];
+        const partnershipEl = document.getElementById('avatarPartnershipMsg');
+        if (partnershipEl) {
+          partnershipEl.textContent = `“${phrase}”`;
+          partnershipEl.style.borderLeftColor = personality.color;
+        }
+      }
       
       // Atualizar informações de gamificação
       const levelInfo = LEVELS.find(l => child.gamification.points >= l.minPoints && child.gamification.points <= l.maxPoints);
@@ -2115,6 +2562,12 @@
         </div>
       `;
       document.getElementById('gamificationInfo').innerHTML = gamificationHTML;
+
+      // Renderizar atributos de competências
+      renderCompetencies(child);
+
+      // Renderizar pergunta do dia
+      renderDailyQuestion(child);
 
       // Atualizar barras de status
       document.getElementById('comportamentoBar').style.width = child.status.comportamento + '%';
@@ -2237,9 +2690,29 @@
       
       // Verificar adereços desbloqueados
       checkUnlockedAccessories(child);
+
+      // Atualizar competências
+      updateCompetencies(child, missionId, quality);
       
       // Mostrar animação de pontos
       showPointsAnimation(points, quality);
+
+      // Frase de parceria pós-missão
+      const personality = AVATAR_PERSONALITIES[child.avatar];
+      if (personality) {
+        const phraseType = quality === 100 ? 'mission_complete' : quality === 50 ? 'mission_partial' : 'struggle';
+        const phrases = personality.phrases[phraseType];
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+        setTimeout(() => {
+          const partnershipEl = document.getElementById('avatarPartnershipMsg');
+          if (partnershipEl) {
+            partnershipEl.textContent = `“${phrase}”`;
+            partnershipEl.style.borderLeftColor = personality.color;
+            partnershipEl.style.animation = 'none';
+            setTimeout(() => { partnershipEl.style.animation = ''; }, 10);
+          }
+        }, 500);
+      }
 
       // Confetes para missão perfeita!
       if (quality === 100) {

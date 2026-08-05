@@ -2,8 +2,29 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>KidsRoutine - Heróis da Rotina</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="KidsRoutine">
+  <meta name="description" content="App de rotina gamificado para crianças">
+  <meta name="theme-color" content="#667eea">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="KidsRoutine">
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png">
   <style>
     * {
       margin: 0;
@@ -3498,6 +3519,74 @@
         document.getElementById('pinInput').value = savedPin;
       }
     };
+  </script>
+
+  <!-- Registro do Service Worker (PWA) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('Service Worker registrado:', reg.scope))
+          .catch(err => console.log('Erro ao registrar Service Worker:', err));
+      });
+    }
+
+    // Prompt de instalação do PWA
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Mostrar botão de instalação após 5 segundos se não estiver instalado
+      setTimeout(() => {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+        if (!isStandalone && deferredPrompt) {
+          showInstallBanner();
+        }
+      }, 5000);
+    });
+
+    function showInstallBanner() {
+      const banner = document.createElement('div');
+      banner.id = 'installBanner';
+      banner.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border-radius: 16px;
+        padding: 16px 20px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 99999;
+        max-width: 340px;
+        width: calc(100% - 40px);
+        animation: slideUp 0.3s ease;
+      `;
+      banner.innerHTML = `
+        <img src="/icons/icon-72x72.png" style="width:48px;height:48px;border-radius:12px;" />
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:14px;color:#1F2937;">Instalar KidsRoutine</div>
+          <div style="font-size:12px;color:#6B7280;">Adicionar à tela inicial</div>
+        </div>
+        <button onclick="installPWA()" style="background:#667eea;color:white;border:none;padding:8px 16px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;">Instalar</button>
+        <button onclick="document.getElementById('installBanner').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;">×</button>
+      `;
+      document.body.appendChild(banner);
+    }
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+          deferredPrompt = null;
+          const banner = document.getElementById('installBanner');
+          if (banner) banner.remove();
+        });
+      }
+    }
   </script>
 </body>
 </html>
